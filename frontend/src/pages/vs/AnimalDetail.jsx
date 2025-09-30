@@ -29,7 +29,7 @@ const AnimalDetail = () => {
     const { token } = useAuth();
 
 
-    const API_BASE_URL = "https://host-cattlecare.onrender.com/api/vs" || 'http://localhost:5000';
+    const API_BASE_URL = "https://host-cattlecare.onrender.com/api" || 'http://localhost:5000';
 
     const getAuthHeaders = () => {
         return {
