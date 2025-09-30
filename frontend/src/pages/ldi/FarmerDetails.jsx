@@ -21,7 +21,7 @@ export default function FarmerDetails() {
         setError(null);
 
         // Fetch farmer details
-        const farmerResponse = await fetch(`http://localhost:5000/api/ldi/farmerdetails/${id}`, {
+        const farmerResponse = await fetch(`/api/ldi/farmerdetails/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

@@ -133,7 +133,7 @@ const AnimalRecords = () => {
     const navigate = useNavigate();
 
     const api = axios.create({
-        baseURL: 'http://localhost:5000/api/vs/animal-health-records',
+        baseURL: '/api/vs/animal-health-records',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`

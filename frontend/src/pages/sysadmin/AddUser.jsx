@@ -67,7 +67,7 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'PD' }
         });
         setProvinces(response.data.data);
@@ -87,7 +87,7 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
     }
     const fetchDistricts = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'RD', parent_division_id: selectedProvince }
         });
         setDistricts(response.data.data);
@@ -107,7 +107,7 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
     }
     const fetchVsDivisions = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'VS', parent_division_id: selectedDistrict }
         });
         setVsDivisions(response.data.data);
@@ -127,7 +127,7 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
     }
     const fetchLdiDivisions = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'LDI', parent_division_id: selectedVsDivision }
         });
         setLdiDivisions(response.data.data);
@@ -147,7 +147,7 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
     }
     const fetchGnDivisions = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'GN', parent_division_id: selectedLdiDivision }
         });
         setGnDivisions(response.data.data);
@@ -216,7 +216,7 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
         if (!initialData.division_id) return;
         try {
           // Fetch the division and its parents to set selected values
-          const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${initialData.division_id}`);
+          const response = await axios.get(`/api/admin/administrative_division/${initialData.division_id}`);
           const division = response.data.data;
           if (!division) return;
           // Set selected divisions based on division_type and parent_division_id
@@ -227,16 +227,16 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
             setSelectedDistrict(division._id);
           } else if (division.division_type === 'VS') {
             // Fetch district to get its parent province
-            const districtResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${division.parent_division_id}`);
+            const districtResponse = await axios.get(`/api/admin/administrative_division/${division.parent_division_id}`);
             const district = districtResponse.data.data;
             setSelectedProvince(district.parent_division_id);
             setSelectedDistrict(division.parent_division_id);
             setSelectedVsDivision(division._id);
           } else if (division.division_type === 'LDI') {
             // Fetch VS division and district to get parents
-            const vsResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${division.parent_division_id}`);
+            const vsResponse = await axios.get(`/api/admin/administrative_division/${division.parent_division_id}`);
             const vsDivision = vsResponse.data.data;
-            const districtResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${vsDivision.parent_division_id}`);
+            const districtResponse = await axios.get(`/api/admin/administrative_division/${vsDivision.parent_division_id}`);
             const district = districtResponse.data.data;
             setSelectedProvince(district.parent_division_id);
             setSelectedDistrict(vsDivision.parent_division_id);
@@ -244,11 +244,11 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
             setSelectedLdiDivision(division._id);
           } else if (division.division_type === 'GN') {
             // Fetch LDI division, VS division and district to get parents
-            const ldiResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${division.parent_division_id}`);
+            const ldiResponse = await axios.get(`/api/admin/administrative_division/${division.parent_division_id}`);
             const ldiDivision = ldiResponse.data.data;
-            const vsResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${ldiDivision.parent_division_id}`);
+            const vsResponse = await axios.get(`/api/admin/administrative_division/${ldiDivision.parent_division_id}`);
             const vsDivision = vsResponse.data.data;
-            const districtResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${vsDivision.parent_division_id}`);
+            const districtResponse = await axios.get(`/api/admin/administrative_division/${vsDivision.parent_division_id}`);
             const district = districtResponse.data.data;
             setSelectedProvince(district.parent_division_id);
             setSelectedDistrict(vsDivision.parent_division_id);
@@ -273,14 +273,14 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
     try {
       if (editMode) {
         // Update existing user
-        await axios.put(`${API_BASE_URL}/api/admin/users/${initialData._id}`, formData);
+        await axios.put(`/api/admin/users/${initialData._id}`, formData);
         setSuccess('User updated successfully!');
         if (onEditComplete) {
           onEditComplete();
         }
       } else {
         // Create new user
-        await axios.post(`${API_BASE_URL}/api/admin`, formData);
+        await axios.post(`/api/admin`, formData);
         setSuccess('User added successfully!');
         setFormData({
           username: '',

@@ -19,10 +19,10 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchChartData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/admin/farms/distribution-by-province');
-        const totalFarmsResponse = await axios.get('http://localhost:5000/api/admin/farms/total');
-        const totalMilkResponse = await axios.get('http://localhost:5000/api/admin/monthly_milk_production/total');
-        const totalCattleResponse = await axios.get('http://localhost:5000/api/admin/animals/total');
+        const response = await axios.get('/api/admin/farms/distribution-by-province');
+        const totalFarmsResponse = await axios.get('/api/admin/farms/total');
+        const totalMilkResponse = await axios.get('/api/admin/monthly_milk_production/total');
+        const totalCattleResponse = await axios.get('/api/admin/animals/total');
 
         if (response.data.success) {
           const combinedData = response.data.data;
@@ -49,7 +49,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchFarmTypeData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/admin/farms/farm-type-distribution');
+        const response = await axios.get('/api/admin/farms/farm-type-distribution');
         if (response.data && response.data.success) {
           setFarmTypeData(response.data.data);
         }

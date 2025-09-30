@@ -16,9 +16,9 @@ const AdministrativeDetails = ({ setCurrentView }) => {
   const fetchDivisions = async () => {
     try {
       setLoading(true);
-      let url = 'http://localhost:5000/api/admin/administrative_division';
+      let url = '/api/admin/administrative_division';
       if (filterType !== 'all') {
-        url = `http://localhost:5000/api/admin/administrative_division/filter?division_type=${filterType}`;
+        url = `/api/admin/administrative_division/filter?division_type=${filterType}`;
       }
       const response = await axios.get(url);
       setDivisions(response.data.data);
@@ -33,7 +33,7 @@ const AdministrativeDetails = ({ setCurrentView }) => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this division?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/admin/administrative_division/${id}`);
+        await axios.delete(`/api/admin/administrative_division/${id}`);
         fetchDivisions();
       } catch (err) {
         console.error("Error deleting administrative division:", err);

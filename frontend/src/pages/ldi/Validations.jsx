@@ -22,7 +22,7 @@ export default function Validations() {
           setLoading(false);
           return;
         }
-        const response = await axios.get(`http://localhost:5000/api/ldi/validations/${ldiOfficerId}`, {
+        const response = await axios.get(`/api/ldi/validations/${ldiOfficerId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -45,7 +45,7 @@ export default function Validations() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/farmer-reports/${reportId}/approve`,
+        `/api/farmer-reports/${reportId}/approve`,
         {},
         {
           headers: {
@@ -83,7 +83,7 @@ export default function Validations() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/farmer-reports/${reportId}/reject`,
+        `/api/farmer-reports/${reportId}/reject`,
         {},
         {
           headers: {

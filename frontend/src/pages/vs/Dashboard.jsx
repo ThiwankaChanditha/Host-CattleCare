@@ -41,7 +41,7 @@ export default function Dashboard() {
             }
 
             try {
-                const response = await axios.get('http://localhost:5000/api/vs/dashboard', {
+                const response = await axios.get('/api/vs/dashboard', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

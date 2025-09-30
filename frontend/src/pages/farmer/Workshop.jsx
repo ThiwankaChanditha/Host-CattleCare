@@ -236,7 +236,7 @@ function WorkshopCard({ workshop, onRegisterClick, onCancelClick, onViewDetailsC
             <div className="relative h-64 overflow-hidden">
                 {workshop.flyer_url ? (
                     <img
-                        src={workshop.flyer_url.startsWith('http') ? workshop.flyer_url : `${API_BASE_URL}${workshop.flyer_url}`}
+                        src={workshop.flyer_url.startsWith('http') ? workshop.flyer_url : `${workshop.flyer_url}`}
                         alt={workshop.program_name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
@@ -346,7 +346,7 @@ function RegisterModal({ isOpen, onClose, onRegister, workshop }) {
                 <div className="relative h-32 overflow-hidden rounded-t-2xl">
                     {workshop.flyer_url ? (
                         <img
-                            src={workshop.flyer_url.startsWith('http') ? workshop.flyer_url : `http://localhost:5000${workshop.flyer_url}`}
+                            src={workshop.flyer_url.startsWith('http') ? workshop.flyer_url : `/api/${workshop.flyer_url}`}
                             alt={workshop.program_name}
                             className="w-full h-full object-cover"
                         />
@@ -418,7 +418,7 @@ function WorkshopDetailsModal({ isOpen, onClose, workshop, conductedByUserName }
                 <div className="relative h-48 overflow-hidden">
                     {workshop.flyer_url ? (
                         <img
-                            src={workshop.flyer_url.startsWith('http') ? workshop.flyer_url : `http://localhost:5000${workshop.flyer_url}`}
+                            src={workshop.flyer_url.startsWith('http') ? workshop.flyer_url : `/api/${workshop.flyer_url}`}
                             alt={workshop.program_name}
                             className="w-full h-full object-cover"
                         />
@@ -520,13 +520,13 @@ export default function Workshop() {
             return;
         }
         try {
-            const programsResponse = await axios.get(`${API_BASE_URL}/api/programs`, {
+            const programsResponse = await axios.get(`/api/programs`, {
                 params: {
                     type: "Workshop",
                 },
             });
             let fetchedWorkshops = programsResponse.data;
-            const registrationsResponse = await axios.get(`${API_BASE_URL}/api/extension_participants/${user.id}`);
+            const registrationsResponse = await axios.get(`/api/extension_participants/${user.id}`);
             const registeredProgramIds = new Set(
                 registrationsResponse.data.map((reg) => reg.program_id)
             );
@@ -560,7 +560,7 @@ export default function Workshop() {
     const confirmRegistration = async () => {
         if (!selectedWorkshopForRegistration || !user?.id) return;
         try {
-            await axios.post(`${API_BASE_URL}/api/extension_participants`, {
+            await axios.post(`/api/extension_participants`, {
                 program_id: selectedWorkshopForRegistration._id,
                 farmer_id: user.id,
                 attendance_status: 'Present',
@@ -592,7 +592,7 @@ export default function Workshop() {
         if (!selectedWorkshopForCancellation || !user?.id) return;
         try {
             await axios.delete(
-                `${API_BASE_URL}/api/extension_participants/${selectedWorkshopForCancellation._id}/${user.id}`
+                `/api/extension_participants/${selectedWorkshopForCancellation._id}/${user.id}`
             );
             fetchWorkshops();
         } catch (err) {
@@ -611,7 +611,7 @@ export default function Workshop() {
                 if (typeof workshop.conducted_by === 'object' && workshop.conducted_by !== null) {
                     setConductedByUserName(workshop.conducted_by.name || workshop.conducted_by.username || 'N/A');
                 } else {
-                    const userResponse = await axios.get(`${API_BASE_URL}/api/users/${workshop.conducted_by}`);
+                    const userResponse = await axios.get(`/api/users/${workshop.conducted_by}`);
                     setConductedByUserName(userResponse.data.name || userResponse.data.username || 'Unknown User');
                 }
             } else {
@@ -639,7 +639,7 @@ export default function Workshop() {
     const confirmDelete = async () => {
         if (!selectedWorkshopForDelete || !user?.id) return;
         try {
-            await axios.delete(`${API_BASE_URL}/api/programs/${selectedWorkshopForDelete._id}`, {
+            await axios.delete(`/api/programs/${selectedWorkshopForDelete._id}`, {
                 data: {
                     userId: user.id,
                     userRole: user.role

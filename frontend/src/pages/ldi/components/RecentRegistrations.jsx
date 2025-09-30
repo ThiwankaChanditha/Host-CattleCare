@@ -11,7 +11,7 @@ export default function RecentRegistrations() {
   useEffect(() => {
     const fetchRecentFarms = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/ldi/farms', {
+        const response = await axios.get('/api/ldi/farms', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

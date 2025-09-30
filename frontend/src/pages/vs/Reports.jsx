@@ -103,7 +103,7 @@ const Reports = () => {
     const [isGeneratingDiseaseReport, setIsGeneratingDiseaseReport] = useState(false);
 
     const api = axios.create({
-        baseURL: 'http://localhost:5000/api/vs/reports',
+        baseURL: '/api/vs/reports',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`

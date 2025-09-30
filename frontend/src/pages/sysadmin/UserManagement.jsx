@@ -36,7 +36,7 @@ const UserManagement = () => {
         } else if (statusParam) {
           queryParams = `?${statusParam}`;
         }
-        const response = await axios.get(`http://localhost:5000/api/admin/users${queryParams}`);
+        const response = await axios.get(`/api/admin/users${queryParams}`);
         setUsers(response.data.data); // assuming response structure is { data: { data: [...] } }
       } catch (err) {
         console.error("Error fetching users:", err);
