@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "build": "cd frontend && npm install && npm run build",
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "dev": "concurrently \"nodemon backend/server.js\" \"cd frontend && npm run dev\""
   },
   "engines": {
     "node": "18.x"
