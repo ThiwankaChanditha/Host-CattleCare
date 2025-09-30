@@ -44,7 +44,7 @@ const AnimalDetail = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`/api/vs/animals/${id}/health-record/${recordId}`, {
+            const response = await fetch(`/vs/animals/${id}/health-record/${recordId}`, {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
