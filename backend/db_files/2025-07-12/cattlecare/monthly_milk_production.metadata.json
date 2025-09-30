@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"b18241381c394fb284f707ec13e9655a","collectionName":"monthly_milk_production","type":"collection"}

@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"678d7bc96ba742cf869f815c90eb1265","collectionName":"animal_health_records","type":"collection"}
