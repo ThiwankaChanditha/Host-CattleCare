@@ -231,7 +231,7 @@ export default function Sidebar() {
                     <Link to={userRolePrefix ? `/${userRolePrefix}/dashboard` : "/"} className="flex flex-col items-center group">
                         <div className="relative">
                             <img
-                                src={user?.profileImage ? `${BACKEND_BASE_URL}${user.profileImage}` : Logo}
+                                src={user?.profileImage ? `/api/${user.profileImage}` : Logo}
                                 alt="Profile"
                                 className={`${isCollapsed ? 'w-12 h-12' : 'w-20 h-20'} rounded-full object-cover border-2 border-gray-100 cursor-pointer hover:border-blue-400 transition-all duration-300 group-hover:scale-105`}
                                 onClick={handleProfileClick}
