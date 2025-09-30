@@ -1,9 +1,10 @@
 {
-  "type": "module",
-  "dependencies": {
-    "date-fns": "^4.1.0",
-    "mongodb": "^6.18.0",
-    "react-datepicker": "^8.4.0",
-    "react-time-picker": "^7.0.0"
+  "name": "cattlecare-merged",
+  "scripts": {
+    "start": "node backend/server.js",
+    "heroku-postbuild": "cd frontend && npm install && npm run build"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
