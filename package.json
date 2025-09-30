@@ -1,8 +1,9 @@
 {
-  "name": "cattlecare-merged",
+  "name": "cattlecare",
   "scripts": {
     "start": "node backend/server.js",
-    "heroku-postbuild": "cd frontend && npm install && npm run build"
+    "build": "cd frontend && npm install && npm run build",
+    "render-postbuild": "cd frontend && npm install && npm run build"
   },
   "engines": {
     "node": "18.x"
