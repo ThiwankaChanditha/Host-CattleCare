@@ -44,7 +44,7 @@ const AnimalDetail = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/vs/animals/${id}/health-record/${recordId}`, {
+            const response = await fetch(`${API_BASE_URL}/vs/animal-detail/${id}/health-record/${recordId}`, {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
@@ -164,7 +164,7 @@ const AnimalDetail = () => {
                 return;
             }
 
-            const response = await fetch(`${API_BASE_URL}/api/${id}/health-record/${recordId}`, {
+            const response = await fetch(`${API_BASE_URL}/vs/animal-detail/${id}/health-record/${recordId}`, {
                 method: 'PUT',
                 headers: getAuthHeaders(),
                 body: JSON.stringify(editedRecordData),
@@ -193,7 +193,7 @@ const AnimalDetail = () => {
                 return;
             }
 
-            const response = await fetch(`/api/${id}/health-record/${recordId}`, {
+            const response = await fetch(`${API_BASE_URL}/vs/animal-detail/${id}/health-record/${recordId}`, {
                 method: 'DELETE',
                 headers: getAuthHeaders()
             });
