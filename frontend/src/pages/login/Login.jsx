@@ -13,7 +13,7 @@ export default function Login() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth(); 
+    const { login } = useAuth();
     const { language, changeLanguage } = useLanguage();
 
     const t = useMemo(() => {
@@ -22,11 +22,11 @@ export default function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setError(""); 
-        setLoading(true); 
+        setError("");
+        setLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:5000/api/login", { email, password });
+            const response = await axios.post("/api/login", { email, password });
             setLoading(false);
 
             const { user: userDetails, token } = response.data;
