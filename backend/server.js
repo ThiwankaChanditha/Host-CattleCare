@@ -8,6 +8,7 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ----------------- Models -----------------
 require('./models/users');
 require('./models/user_roles');
 require('./models/extension_programs');
@@ -23,7 +24,7 @@ require('./models/program_attachments');
 require('./models/monthly_milk_production');
 require('./models/administrative_divisions');
 
-
+// ----------------- Routes -----------------
 const authRoutes = require('./routes/auth');
 const forumRoutes = require('./controllers/forum');
 const programRoutes = require('./routes/programRoutes');
@@ -50,9 +51,9 @@ const adminFarmerMonthlyReportRoute = require('./routes/farmer_monthly_report.ro
 const adminAdministrativeDivisionRoute = require('./routes/administrative_division.route');
 const adminUserRoleRoute = require('./routes/user_role_routes');
 
-
+// ----------------- Middleware -----------------
 const corsOptions = {
-    origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
+    origin: process.env.NODE_ENV === 'production' ? '*' : 'http://localhost:5173',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -61,34 +62,16 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
+// Ensure uploads directories exist
 const uploadsDir = path.join(__dirname, 'uploads');
 const profileUploadsDir = path.join(uploadsDir, 'profile');
 fs.mkdirSync(uploadsDir, { recursive: true });
 fs.mkdirSync(profileUploadsDir, { recursive: true });
-console.log(`Ensured upload directories exist: ${uploadsDir}, ${profileUploadsDir}`);
 
-app.use('/uploads', (req, res, next) => {
-    console.log('--- Express Static Debugging ---');
-    console.log(`Request for static file received: ${req.originalUrl}`);
-    const absolutePathAttempt = path.join(__dirname, 'uploads', req.path);
-    console.log(`Attempting to serve physical file from: ${absolutePathAttempt}`);
-
-    if (fs.existsSync(absolutePathAttempt)) {
-        const stats = fs.statSync(absolutePathAttempt);
-        console.log(`File EXISTS! Size: ${stats.size} bytes.`);
-        if (stats.size === 0) {
-            console.warn('WARNING: File exists but is 0 bytes! It might be corrupted or empty.');
-        }
-    } else {
-        console.error(`ERROR: File DOES NOT EXIST at: ${absolutePathAttempt}`);
-    }
-    console.log('--- End Express Static Debugging ---');
-    next();
-});
+// Serve uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
+// ----------------- API Routes -----------------
 app.use('/api', authRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/notifications', notificationRoutes);
@@ -102,7 +85,6 @@ app.use('/api/vs/dashboard', vsDashboardRoutes);
 app.use('/api/vs/appointments', vsAppointmentRoutes);
 app.use('/api/vs/animal-health-records', vsAnimalHealthRecordsRoutes);
 app.use('/api/vs/animal-detail', vsAnimalDetailRecordsRoutes);
-app.use('/api', vsAnimalDetailRecordsRoutes);
 app.use('/api/vs/animal-history', vsAnimalHistoryRoutes);
 app.use('/api/vs/reports', vsReportsRoutes);
 app.use('/api/animals', animalRoutes);
@@ -116,35 +98,29 @@ app.use('/api/admin/farmer_monthly_reports', adminFarmerMonthlyReportRoute);
 app.use('/api/admin/administrative_division', adminAdministrativeDivisionRoute);
 app.use('/api/admin/user_roles', adminUserRoleRoute);
 
+// ----------------- Serve React Frontend -----------------
+const frontendBuildPath = path.join(__dirname, '../frontend/build');
+app.use(express.static(frontendBuildPath));
 
-app.get('/', (req, res) => {
-    res.send('Cattle Management App Backend is running!');
+// Catch-all for React (any route NOT starting with /api)
+app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
 });
 
+// ----------------- Error Handling -----------------
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
     res.status(500).json({ message: 'Internal Server Error' });
 });
 
+// ----------------- Start Server -----------------
 async function startServer() {
     try {
         const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/cattlecare';
-
-        if (!mongoURI) {
-            throw new Error("❌ MONGO_URI is not defined in .env file");
-        }
-
-        await mongoose.connect(mongoURI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-
+        await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
         console.log('✅ MongoDB connected successfully');
 
-        app.listen(PORT, () => {
-            console.log(`🚀 Server is running on port ${PORT}`);
-        });
-
+        app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
     } catch (err) {
         console.error('❌ MongoDB connection error:', err);
         process.exit(1);
