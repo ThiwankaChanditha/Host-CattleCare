@@ -29,7 +29,7 @@ const AnimalDetail = () => {
     const { token } = useAuth();
 
 
-    const API_BASE_URL = "https://host-cattlecare.onrender.com/api" || 'http://localhost:5000';
+    const API_BASE_URL = "https://host-cattlecare.onrender.com/api/vs" || 'http://localhost:5000';
 
     const getAuthHeaders = () => {
         return {
@@ -44,7 +44,7 @@ const AnimalDetail = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/${id}/health-record/${recordId}`, {
+            const response = await fetch(`/api/vs/animals/${id}/health-record/${recordId}`, {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
