@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"47da113bd5af49808d07b883d79f05e3","collectionName":"farm_infrastructure","type":"collection"}

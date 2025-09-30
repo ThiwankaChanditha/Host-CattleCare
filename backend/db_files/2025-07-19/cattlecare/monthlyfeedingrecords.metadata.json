@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"687474a88885434ca25bdf5e005e4c5b","collectionName":"monthlyfeedingrecords","type":"collection"}

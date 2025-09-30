@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"ca900b04ea8945e18d6cb1165f70311b","collectionName":"milk_collection_points","type":"collection"}

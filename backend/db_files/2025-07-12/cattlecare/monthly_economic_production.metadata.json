@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"810f868e63ff49358d0ea96289b9c07d","collectionName":"monthly_economic_production","type":"collection"}

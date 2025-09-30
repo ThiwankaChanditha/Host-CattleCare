@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"d6a76e82ff4f4f4fa6875fd60c7e633f","collectionName":"animal_breeds","type":"collection"}
