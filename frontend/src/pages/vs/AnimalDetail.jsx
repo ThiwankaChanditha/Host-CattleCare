@@ -28,6 +28,9 @@ const AnimalDetail = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const { token } = useAuth();
 
+
+    const API_BASE_URL = "https://host-cattlecare.onrender.com/api" || 'http://localhost:5000';
+
     const getAuthHeaders = () => {
         return {
             'Content-Type': 'application/json',
@@ -41,7 +44,7 @@ const AnimalDetail = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`/api/${id}/health-record/${recordId}`, {
+            const response = await fetch(`${API_BASE_URL}/${id}/health-record/${recordId}`, {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
