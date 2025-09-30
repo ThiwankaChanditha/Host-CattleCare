@@ -85,6 +85,7 @@ app.use('/api/vs/dashboard', vsDashboardRoutes);
 app.use('/api/vs/appointments', vsAppointmentRoutes);
 app.use('/api/vs/animal-health-records', vsAnimalHealthRecordsRoutes);
 app.use('/api/vs/animal-detail', vsAnimalDetailRecordsRoutes);
+app.use('/api/vs/animals', vsAnimalDetailRecordsRoutes);
 app.use('/api/vs/animal-history', vsAnimalHistoryRoutes);
 app.use('/api/vs/reports', vsReportsRoutes);
 app.use('/api/animals', animalRoutes);
