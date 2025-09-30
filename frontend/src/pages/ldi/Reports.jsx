@@ -49,7 +49,7 @@ export default function Reports() {
         setLoading(true);
         
         // Fetch farms (this endpoint works correctly)
-        const farmsResponse = await fetch('http://localhost:5000/api/ldi/farms', {
+        const farmsResponse = await fetch('/api/ldi/farms', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -63,7 +63,7 @@ export default function Reports() {
         }
 
         // Fetch animals for all farms - we need to fetch animals for each farm individually
-        const farmsForAnimals = await fetch('http://localhost:5000/api/ldi/farms', {
+        const farmsForAnimals = await fetch('/api/ldi/farms', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ export default function Reports() {
           
           // Fetch animals for each farm
           for (const farm of farmsData.data) {
-            const animalsResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${farm._id}/animals`, {
+            const animalsResponse = await fetch(`/api/ldi/farmdetails/${farm._id}/animals`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ export default function Reports() {
         }
 
         // Fetch milk production data for all farms
-        const farmsForMilk = await fetch('http://localhost:5000/api/ldi/farms', {
+        const farmsForMilk = await fetch('/api/ldi/farms', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -109,7 +109,7 @@ export default function Reports() {
           
           // Fetch milk data for each farm
           for (const farm of farmsData.data) {
-            const milkResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${farm._id}/milk`, {
+            const milkResponse = await fetch(`/api/ldi/farmdetails/${farm._id}/milk`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -129,7 +129,7 @@ export default function Reports() {
         }
 
         // Fetch AI data for all farms
-        const farmsForAI = await fetch('http://localhost:5000/api/ldi/farms', {
+        const farmsForAI = await fetch('/api/ldi/farms', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -142,7 +142,7 @@ export default function Reports() {
           
           // Fetch AI data for each farm
           for (const farm of farmsData.data) {
-            const aiResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${farm._id}/ai`, {
+            const aiResponse = await fetch(`/api/ldi/farmdetails/${farm._id}/ai`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'

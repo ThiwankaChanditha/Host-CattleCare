@@ -32,10 +32,10 @@ export default function Farmers() {
   };
 
   const fetchFarmers = async () => {
-    
+
     try {
 
-      const response = await fetch('http://localhost:5000/api/ldi/farmers',{
+      const response = await fetch('/api/ldi/farmers', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -54,7 +54,7 @@ export default function Farmers() {
 
   const fetchFarms = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/ldi/farms',{
+      const response = await fetch('/api/ldi/farms', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -92,28 +92,26 @@ export default function Farmers() {
   return (
     <>
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Farmers Management</h1>
-      
+
       {/* Tab Navigation */}
       <div className="border-b border-gray-200 mb-6">
         <nav className="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto">
           <button
             onClick={() => setActiveTab('farmers')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-              activeTab === 'farmers'
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${activeTab === 'farmers'
                 ? 'border-green-500 text-green-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             <UsersIcon className="w-5 h-5 inline mr-2" />
             Farmers ({farmers.length})
           </button>
           <button
             onClick={() => setActiveTab('farms')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-              activeTab === 'farms'
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${activeTab === 'farms'
                 ? 'border-green-500 text-green-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             <HomeIcon className="w-5 h-5 inline mr-2" />
             Farms ({farms.length})
@@ -140,7 +138,7 @@ export default function Farmers() {
   );
 }
 
-function FarmersSection({ farmers, onAddFarmerClick}) {
+function FarmersSection({ farmers, onAddFarmerClick }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const filteredFarmers = useMemo(() => {
@@ -175,7 +173,7 @@ function FarmersSection({ farmers, onAddFarmerClick}) {
           Add New Farmer
         </button>
       </div>
-      
+
       {/* Mobile Cards */}
       <div className="md:hidden grid grid-cols-1 gap-3">
         {filteredFarmers.length === 0 ? (
@@ -197,7 +195,7 @@ function FarmersSection({ farmers, onAddFarmerClick}) {
                 <div className="truncate"><span className="text-gray-500">Address:</span> {farmer.user_id?.address || 'N/A'}</div>
               </div>
               <div className="mt-2 flex justify-end">
-                <button 
+                <button
                   className="text-green-700 hover:text-green-900 font-medium"
                   onClick={() => handleViewFarmer(farmer._id)}
                 >
@@ -269,7 +267,7 @@ function FarmersSection({ farmers, onAddFarmerClick}) {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button 
+                      <button
                         className="text-green-600 hover:text-green-900 mr-3"
                         onClick={() => handleViewFarmer(farmer._id)}
                       >
@@ -322,7 +320,7 @@ function FarmsSection({ farms, onAddFarmClick }) {
           Add New Farm
         </button>
       </div>
-      
+
       {/* Mobile Cards */}
       <div className="md:hidden grid grid-cols-1 gap-3">
         {filteredFarms.length === 0 ? (
@@ -345,7 +343,7 @@ function FarmsSection({ farms, onAddFarmClick }) {
                 <div className="truncate"><span className="text-gray-500">Location:</span> {farm.location_address || 'N/A'}</div>
               </div>
               <div className="mt-2 flex justify-end">
-                <button 
+                <button
                   className="text-green-700 hover:text-green-900 font-medium"
                   onClick={() => handleViewFarm(farm._id)}
                 >
@@ -414,14 +412,13 @@ function FarmsSection({ farms, onAddFarmClick }) {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        farm.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${farm.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
                         {farm.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button 
+                      <button
                         className="text-green-600 hover:text-green-900 mr-3"
                         onClick={() => handleViewFarm(farm._id)}
                       >

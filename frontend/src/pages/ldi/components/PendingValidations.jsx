@@ -11,7 +11,7 @@ export default function PendingValidations() {
   useEffect(() => {
     const fetchRecentValidations = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/ldi/dashboard', {
+        const response = await axios.get('/api/ldi/dashboard', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

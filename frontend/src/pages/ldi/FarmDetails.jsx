@@ -56,7 +56,7 @@ export default function FarmDetails() {
         setError(null);
 
         // Fetch farm details
-        const farmResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}`, {
+        const farmResponse = await fetch(`/api/ldi/farmdetails/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -71,7 +71,7 @@ export default function FarmDetails() {
         setFarm(farmData.data);
 
         // Fetch animals for this farm
-        const animalsResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}/animals`, {
+        const animalsResponse = await fetch(`/api/ldi/farmdetails/${id}/animals`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -87,7 +87,7 @@ export default function FarmDetails() {
         }
 
         // Fetch milk production data for this farm
-        const milkResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}/milk`, {
+        const milkResponse = await fetch(`/api/ldi/farmdetails/${id}/milk`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -103,7 +103,7 @@ export default function FarmDetails() {
         }
 
         // Fetch AI data for this farm
-        const aiResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}/ai`, {
+        const aiResponse = await fetch(`/api/ldi/farmdetails/${id}/ai`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -138,9 +138,9 @@ export default function FarmDetails() {
   const handleAnimalMoreInfo = async (animal) => {
     try {
       setSelectedAnimal(animal);
-      
+
       // Fetch AI records for this specific animal using the new endpoint
-      const aiResponse = await fetch(`http://localhost:5000/api/animals/${animal._id}/ai-records`, {
+      const aiResponse = await fetch(`/api/animals/${animal._id}/ai-records`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -153,7 +153,7 @@ export default function FarmDetails() {
       } else {
         setSelectedAnimalAIRecords([]);
       }
-      
+
       setShowAnimalInfoModal(true);
     } catch (error) {
       console.error('Error fetching animal AI records:', error);
@@ -169,7 +169,7 @@ export default function FarmDetails() {
 
   const handleUpdateAnimal = async (animalId, animalData) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/animals/update/${animalId}`, {
+      const response = await fetch(`/api/animals/update/${animalId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -184,9 +184,9 @@ export default function FarmDetails() {
       }
 
       const result = await response.json();
-      
+
       // Refresh the animals list
-      const animalsResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}/animals`, {
+      const animalsResponse = await fetch(`/api/ldi/farmdetails/${id}/animals`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -207,7 +207,7 @@ export default function FarmDetails() {
 
   const handleAddAnimal = async (animalData) => {
     try {
-      const response = await fetch('http://localhost:5000/api/animals/add', {
+      const response = await fetch('/api/animals/add', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -222,9 +222,9 @@ export default function FarmDetails() {
       }
 
       const result = await response.json();
-      
+
       // Refresh the animals list
-      const animalsResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}/animals`, {
+      const animalsResponse = await fetch(`/api/ldi/farmdetails/${id}/animals`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -247,7 +247,7 @@ export default function FarmDetails() {
     try {
       console.log('Adding AI record:', aiData);
       // Refresh the AI data list
-      const aiResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}/ai`, {
+      const aiResponse = await fetch(`/api/ldi/farmdetails/${id}/ai`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -266,7 +266,7 @@ export default function FarmDetails() {
   const handleUpdatePregnancyStatus = async (updatedRecord) => {
     try {
       // Refresh the AI data list
-      const aiResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}/ai`, {
+      const aiResponse = await fetch(`/api/ldi/farmdetails/${id}/ai`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -305,7 +305,7 @@ export default function FarmDetails() {
   const handleSaveAIRecord = async (recordId, updatedData) => {
     try {
       // Refresh the AI data list
-      const aiResponse = await fetch(`http://localhost:5000/api/ldi/farmdetails/${id}/ai`, {
+      const aiResponse = await fetch(`/api/ldi/farmdetails/${id}/ai`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -393,7 +393,7 @@ export default function FarmDetails() {
         <div className="text-red-500 text-center">
           <p className="text-lg font-semibold mb-2">Error</p>
           <p>{error}</p>
-          <button 
+          <button
             onClick={handleBack}
             className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
           >
@@ -409,7 +409,7 @@ export default function FarmDetails() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-gray-500 text-center">
           <p className="text-lg font-semibold mb-2">Farm Not Found</p>
-          <button 
+          <button
             onClick={handleBack}
             className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
           >
@@ -425,7 +425,7 @@ export default function FarmDetails() {
       {/* Header with Back Button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div className="flex items-center">
-          <button 
+          <button
             onClick={handleBack}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center"
           >
@@ -441,14 +441,14 @@ export default function FarmDetails() {
           Edit Farm
         </button>
       </div>
-      
+
       {/* Farm Information Card */}
       <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-6">
         <div className="flex items-center mb-4">
           <HomeIcon className="w-6 h-6 text-green-600 mr-2" />
           <h3 className="text-xl font-semibold text-green-700">{farm.farm_name || 'Unnamed Farm'}</h3>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="flex items-start">
             <div className="bg-green-100 p-2 rounded-lg mr-3">
@@ -508,9 +508,8 @@ export default function FarmDetails() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Status</p>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                farm.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${farm.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
                 {farm.is_active ? 'Active' : 'Inactive'}
               </span>
             </div>
@@ -528,9 +527,8 @@ export default function FarmDetails() {
               <button
                 onClick={() => setActiveSection('animals')}
                 aria-label="Animals"
-                className={`flex flex-col items-center p-2 rounded-lg text-xs ${
-                  activeSection === 'animals' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'text-gray-600 bg-gray-50'
-                }`}
+                className={`flex flex-col items-center p-2 rounded-lg text-xs ${activeSection === 'animals' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'text-gray-600 bg-gray-50'
+                  }`}
               >
                 <UserIcon className="w-5 h-5" />
                 <span className="mt-1">Animals</span>
@@ -538,9 +536,8 @@ export default function FarmDetails() {
               <button
                 onClick={() => setActiveSection('milk')}
                 aria-label="Milk"
-                className={`flex flex-col items-center p-2 rounded-lg text-xs ${
-                  activeSection === 'milk' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'text-gray-600 bg-gray-50'
-                }`}
+                className={`flex flex-col items-center p-2 rounded-lg text-xs ${activeSection === 'milk' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'text-gray-600 bg-gray-50'
+                  }`}
               >
                 <DropletsIcon className="w-5 h-5" />
                 <span className="mt-1">Milk</span>
@@ -548,9 +545,8 @@ export default function FarmDetails() {
               <button
                 onClick={() => setActiveSection('ai')}
                 aria-label="AI"
-                className={`flex flex-col items-center p-2 rounded-lg text-xs ${
-                  activeSection === 'ai' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'text-gray-600 bg-gray-50'
-                }`}
+                className={`flex flex-col items-center p-2 rounded-lg text-xs ${activeSection === 'ai' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'text-gray-600 bg-gray-50'
+                  }`}
               >
                 <HeartIcon className="w-5 h-5" />
                 <span className="mt-1">AI</span>
@@ -558,9 +554,8 @@ export default function FarmDetails() {
               <button
                 onClick={() => setActiveSection('analytics')}
                 aria-label="Analytics"
-                className={`flex flex-col items-center p-2 rounded-lg text-xs ${
-                  activeSection === 'analytics' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'text-gray-600 bg-gray-50'
-                }`}
+                className={`flex flex-col items-center p-2 rounded-lg text-xs ${activeSection === 'analytics' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'text-gray-600 bg-gray-50'
+                  }`}
               >
                 <TrendingUpIcon className="w-5 h-5" />
                 <span className="mt-1">Analytics</span>
@@ -571,44 +566,40 @@ export default function FarmDetails() {
           <nav className="-mb-px hidden sm:flex space-x-8 px-6" aria-label="Tabs">
             <button
               onClick={() => setActiveSection('animals')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeSection === 'animals'
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeSection === 'animals'
                   ? 'border-green-500 text-green-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               <HomeIcon className="w-5 h-5 mr-2" />
               Animals ({animals.length})
             </button>
             <button
               onClick={() => setActiveSection('milk')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeSection === 'milk'
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeSection === 'milk'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               <DropletsIcon className="w-5 h-5 mr-2" />
               Milk Production ({milkData.length})
             </button>
             <button
               onClick={() => setActiveSection('ai')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeSection === 'ai'
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeSection === 'ai'
                   ? 'border-pink-500 text-pink-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               <HeartIcon className="w-5 h-5 mr-2" />
               AI Records ({aiData.length})
             </button>
             <button
               onClick={() => setActiveSection('analytics')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeSection === 'analytics'
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeSection === 'analytics'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               <TrendingUpIcon className="w-5 h-5 mr-2" />
               Analytics
@@ -662,9 +653,8 @@ export default function FarmDetails() {
                             <p className="text-xs text-gray-500">Tag</p>
                             <p className="text-sm font-medium text-gray-900">{animal.animal_tag || 'N/A'}</p>
                           </div>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            animal.current_status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${animal.current_status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                            }`}>
                             {animal.current_status || 'Unknown'}
                           </span>
                         </div>
@@ -687,14 +677,14 @@ export default function FarmDetails() {
                           </div>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2 mt-4">
-                          <button 
+                          <button
                             onClick={() => handleAnimalMoreInfo(animal)}
                             className="w-full sm:w-auto justify-center flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
                           >
                             <InfoIcon className="h-4 w-4" />
                             More Info
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleEditAnimal(animal)}
                             className="w-full sm:w-auto justify-center flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100"
                           >
@@ -753,14 +743,14 @@ export default function FarmDetails() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               <div className="flex gap-2">
-                                <button 
+                                <button
                                   onClick={() => handleAnimalMoreInfo(animal)}
                                   className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
                                 >
                                   <InfoIcon className="h-4 w-4" />
                                   More Info
                                 </button>
-                                <button 
+                                <button
                                   onClick={() => handleEditAnimal(animal)}
                                   className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100"
                                 >
@@ -953,12 +943,11 @@ export default function FarmDetails() {
                             <p className="text-xs text-gray-500">AI Date</p>
                             <p className="text-sm font-medium text-gray-900">{record.ai_date ? new Date(record.ai_date).toLocaleDateString() : 'N/A'}</p>
                           </div>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            record.pregnancy_status === 'Pregnant' ? 'bg-green-100 text-green-800' : 
-                            record.pregnancy_status === 'Not Pregnant' ? 'bg-red-100 text-red-800' : 
-                            record.pregnancy_status === 'Aborted' ? 'bg-orange-100 text-orange-800' :
-                            'bg-yellow-100 text-yellow-800'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.pregnancy_status === 'Pregnant' ? 'bg-green-100 text-green-800' :
+                              record.pregnancy_status === 'Not Pregnant' ? 'bg-red-100 text-red-800' :
+                                record.pregnancy_status === 'Aborted' ? 'bg-orange-100 text-orange-800' :
+                                  'bg-yellow-100 text-yellow-800'
+                            }`}>
                             {record.pregnancy_status || 'Unknown'}
                           </span>
                         </div>
@@ -1013,12 +1002,11 @@ export default function FarmDetails() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-500 mb-1">Pregnancy Status</label>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            record.pregnancy_status === 'Pregnant' ? 'bg-green-100 text-green-800' : 
-                            record.pregnancy_status === 'Not Pregnant' ? 'bg-red-100 text-red-800' : 
-                            record.pregnancy_status === 'Aborted' ? 'bg-orange-100 text-orange-800' :
-                            'bg-yellow-100 text-yellow-800'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.pregnancy_status === 'Pregnant' ? 'bg-green-100 text-green-800' :
+                              record.pregnancy_status === 'Not Pregnant' ? 'bg-red-100 text-red-800' :
+                                record.pregnancy_status === 'Aborted' ? 'bg-orange-100 text-orange-800' :
+                                  'bg-yellow-100 text-yellow-800'
+                            }`}>
                             {record.pregnancy_status || 'Unknown'}
                           </span>
                         </div>
@@ -1033,7 +1021,7 @@ export default function FarmDetails() {
                       {/* Action Buttons */}
                       <div className="hidden sm:flex items-center justify-between pt-4 border-t border-gray-100">
                         <div className="flex gap-3">
-                          <button 
+                          <button
                             onClick={() => handleMoreInfoClick(record)}
                             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
                             title="More Info"
@@ -1041,7 +1029,7 @@ export default function FarmDetails() {
                             <InfoIcon className="h-4 w-4" />
                             More Info
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleEditClick(record)}
                             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100"
                             title="Edit"
@@ -1049,7 +1037,7 @@ export default function FarmDetails() {
                             <EditIcon className="h-4 w-4" />
                             Edit
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleUpdateStatusClick(record)}
                             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-orange-600 bg-orange-50 rounded-md hover:bg-orange-100"
                             title="Update Status"
@@ -1057,7 +1045,7 @@ export default function FarmDetails() {
                             <FileTextIcon className="h-4 w-4" />
                             Status
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleAttachFilesClick(record)}
                             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-md hover:bg-purple-100"
                             title="Attach Files"
@@ -1070,7 +1058,7 @@ export default function FarmDetails() {
                       {/* Mobile actions: primary + collapsible more */}
                       <div className="sm:hidden pt-4 border-t border-gray-100">
                         <div className="flex flex-col gap-2">
-                          <button 
+                          <button
                             onClick={() => handleMoreInfoClick(record)}
                             className="w-full justify-center flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
                             title="More Info"
@@ -1088,7 +1076,7 @@ export default function FarmDetails() {
                           </button>
                           {expandedAIActionIds[record._id] && (
                             <div id={`ai-actions-${record._id}`} className="grid grid-cols-1 gap-2 mt-1">
-                              <button 
+                              <button
                                 onClick={() => handleEditClick(record)}
                                 className="w-full justify-center flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100"
                                 title="Edit"
@@ -1096,7 +1084,7 @@ export default function FarmDetails() {
                                 <EditIcon className="h-4 w-4" />
                                 Edit
                               </button>
-                              <button 
+                              <button
                                 onClick={() => handleUpdateStatusClick(record)}
                                 className="w-full justify-center flex items-center gap-2 px-3 py-2 text-sm font-medium text-orange-600 bg-orange-50 rounded-md hover:bg-orange-100"
                                 title="Update Status"
@@ -1104,7 +1092,7 @@ export default function FarmDetails() {
                                 <FileTextIcon className="h-4 w-4" />
                                 Status
                               </button>
-                              <button 
+                              <button
                                 onClick={() => handleAttachFilesClick(record)}
                                 className="w-full justify-center flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-md hover:bg-purple-100"
                                 title="Attach Files"
@@ -1127,14 +1115,14 @@ export default function FarmDetails() {
           {activeSection === 'analytics' && (
             <div className="p-4 sm:p-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
               <div className="flex items-center justify-end mb-4">
-                <FarmReportGenerator 
+                <FarmReportGenerator
                   farm={farm}
                   animals={animals}
                   aiData={aiData}
                   milkData={milkData}
                 />
               </div>
-              <FarmAnalytics 
+              <FarmAnalytics
                 animals={animals}
                 aiData={aiData}
                 milkData={milkData}

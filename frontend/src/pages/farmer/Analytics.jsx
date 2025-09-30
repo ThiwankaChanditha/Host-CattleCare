@@ -109,7 +109,7 @@ function Analytics() {
                         Authorization: `Bearer ${token}`, // Get token from user object
                     },
                 };
-                const response = await axios.get(`${API_BASE_URL}/api/farmer-analytics/${user.id}`, config);
+                const response = await axios.get(`/api/farmer-analytics/${user.id}`, config);
                 setFarmData(response.data);
             } catch (err) {
                 console.error("Error fetching analytics data:", err);

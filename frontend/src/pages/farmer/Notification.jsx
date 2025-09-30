@@ -45,7 +45,7 @@ const translations = {
         clearAllTitle: "Confirm Clear All",
         notificationMarkedAsRead: "Notification marked as read!",
         notificationDismissed: "Notification dismissed!",
-        newNotification: "New", 
+        newNotification: "New",
     },
     si: {
         notifications: "දැනුම්දීම්",
@@ -80,7 +80,7 @@ const translations = {
         clearAllTitle: "සියල්ල ඉවත් කිරීම තහවුරු කරන්න",
         notificationMarkedAsRead: "දැනුම්දීම කියවූ ලෙස සලකුණු කරන ලදී!",
         notificationDismissed: "දැනුම්දීම ඉවත් කරන ලදී!",
-        newNotification: "නව", 
+        newNotification: "නව",
     },
     ta: {
         notifications: "அறிவிப்புகள்",
@@ -115,7 +115,7 @@ const translations = {
         clearAllTitle: "அனைத்தையும் அழிக்க உறுதிப்படுத்தவும்",
         notificationMarkedAsRead: "அறிவிப்பு படித்ததாக குறிக்கப்பட்டது!",
         notificationDismissed: "அறிவிப்பு நிராகரிக்கப்பட்டது!",
-        newNotification: "புதிய", 
+        newNotification: "புதிய",
     },
 };
 
@@ -141,7 +141,7 @@ export default function Notifications() {
     const fetchNotificationsData = useCallback(async () => {
         setLoading(true);
         setError(null);
-        setSuccessMessage(null); 
+        setSuccessMessage(null);
 
         if (!isAuthenticated || !user?.id) {
             setError(t.notAuthenticated);
@@ -151,7 +151,7 @@ export default function Notifications() {
 
         try {
             const userIdToFetch = user.id;
-            const response = await axios.get(`${API_BASE_URL}/api/notifications/${userIdToFetch}`);
+            const response = await axios.get(`/api/notifications/${userIdToFetch}`);
             setNotifications(response.data);
             setError(null);
             setLoading(false);
@@ -167,7 +167,7 @@ export default function Notifications() {
     useEffect(() => {
         if (isAuthenticated && user?.id) {
             fetchNotificationsData();
-        } else if (!isAuthenticated) { 
+        } else if (!isAuthenticated) {
             setLoading(false);
             setError(t.notAuthenticated);
         }
@@ -213,18 +213,18 @@ export default function Notifications() {
             return;
         }
         try {
-            await axios.put(`${API_BASE_URL}/api/notifications/${user.id}/read/${notificationId}`);
+            await axios.put(`/api/notifications/${user.id}/read/${notificationId}`);
             setNotifications((prevNotifications) =>
                 prevNotifications.map((notif) =>
                     notif.id === notificationId ? { ...notif, read: true } : notif
                 )
             );
             setSuccessMessage(t.notificationMarkedAsRead);
-            setError(null); 
+            setError(null);
         } catch (err) {
             console.error("Error marking notification as read:", err);
             setError(t.batchActionError);
-            setSuccessMessage(null); 
+            setSuccessMessage(null);
         }
     };
 
@@ -234,14 +234,14 @@ export default function Notifications() {
             return;
         }
         try {
-            await axios.put(`${API_BASE_URL}/api/notifications/${user.id}/dismiss/${notificationId}`);
+            await axios.put(`/api/notifications/${user.id}/dismiss/${notificationId}`);
             setNotifications((prevNotifications) =>
                 prevNotifications.map((notif) =>
                     notif.id === notificationId ? { ...notif, is_dismissed: true } : notif
                 )
             );
             setSuccessMessage(t.notificationDismissed);
-            setError(null); 
+            setError(null);
         } catch (err) {
             console.error("Error marking notification as dismissed:", err);
             setError(t.batchActionError);
@@ -264,34 +264,34 @@ export default function Notifications() {
             return;
         }
         try {
-            await axios.put(`${API_BASE_URL}/api/notifications/${user.id}/mark-all-read`);
+            await axios.put(`/api/notifications/${user.id}/mark-all-read`);
             setNotifications(prevNotifications =>
                 prevNotifications.map(notif => ({ ...notif, read: true }))
             );
             setSuccessMessage(t.allNotificationsMarked);
-            setError(null); 
+            setError(null);
         } catch (err) {
             console.error("Error marking all notifications as read:", err);
             setError(t.batchActionError);
-            setSuccessMessage(null); 
+            setSuccessMessage(null);
         }
     };
 
     const confirmClearAllNotifications = async () => {
-        setIsClearAllModalOpen(false); 
+        setIsClearAllModalOpen(false);
         if (!user?.id) {
             setError(t.notAuthenticated);
             return;
         }
         try {
-            await axios.delete(`${API_BASE_URL}/api/notifications/${user.id}/clear-all`);
+            await axios.delete(`/api/notifications/${user.id}/clear-all`);
             setNotifications([]);
             setSuccessMessage(t.allNotificationsCleared);
             setError(null);
         } catch (err) {
             console.error("Error clearing all notifications:", err);
             setError(t.batchActionError);
-            setSuccessMessage(null); 
+            setSuccessMessage(null);
         }
     };
 
@@ -364,7 +364,7 @@ export default function Notifications() {
                 </div>
             )}
 
-            <div className="flex flex-col gap-4"> 
+            <div className="flex flex-col gap-4">
                 {loading ? (
                     <div className="p-10 text-center text-gray-500 text-lg">{t.loadingNotifications}</div>
                 ) : currentData.length === 0 ? (

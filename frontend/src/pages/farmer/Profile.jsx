@@ -136,13 +136,13 @@ function Profile() {
             setLoading(true);
             setError(null);
             try {
-                console.log(`Debug: Attempting to fetch farmer profile from: ${API_BASE_URL}/api/farmer/profile`);
+                console.log(`Debug: Attempting to fetch farmer profile from: /api/farmer/profile`);
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 };
-                const response = await axios.get(`${API_BASE_URL}/api/farmer/profile`, config);
+                const response = await axios.get(`/api/farmer/profile`, config);
 
                 const profileData = {
                     ...response.data,

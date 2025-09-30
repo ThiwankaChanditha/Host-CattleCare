@@ -34,7 +34,7 @@ export default function StatsOverview() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/ldi/dashboard', {
+        const response = await axios.get('/api/ldi/dashboard', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

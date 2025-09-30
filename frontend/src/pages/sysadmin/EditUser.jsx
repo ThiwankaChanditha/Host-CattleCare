@@ -65,7 +65,7 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'PD' }
         });
         setProvinces(response.data.data);
@@ -85,7 +85,7 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
     }
     const fetchDistricts = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'RD', parent_division_id: selectedProvince }
         });
         setDistricts(response.data.data);
@@ -105,7 +105,7 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
     }
     const fetchVsDivisions = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'VS', parent_division_id: selectedDistrict }
         });
         setVsDivisions(response.data.data);
@@ -125,7 +125,7 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
     }
     const fetchLdiDivisions = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/filter`, {
+        const response = await axios.get(`/api/admin/administrative_division/filter`, {
           params: { division_type: 'LDI', parent_division_id: selectedVsDivision }
         });
         setLdiDivisions(response.data.data);
@@ -153,7 +153,7 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
         setLoading(true);
         setError(null);
         try {
-          const response = await axios.get(`${API_BASE_URL}/api/admin/users/${id}`);
+          const response = await axios.get(`/api/admin/users/${id}`);
           const userData = response.data.data;
           setUserId(userData._id);
           setFormData({
@@ -173,7 +173,7 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
             if (!userData.division_id) return;
             const divisionId = typeof userData.division_id === 'object' ? userData.division_id._id : userData.division_id;
             try {
-              const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${divisionId}`);
+              const response = await axios.get(`/api/admin/administrative_division/${divisionId}`);
               const division = response.data.data;
               if (!division) return;
               if (division.division_type === 'PD') {
@@ -182,15 +182,15 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
                 setSelectedProvince(prev => prev !== division.parent_division_id ? division.parent_division_id : prev);
                 setSelectedDistrict(prev => prev !== division._id ? division._id : prev);
               } else if (division.division_type === 'VS') {
-                const districtResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${division.parent_division_id}`);
+                const districtResponse = await axios.get(`/api/admin/administrative_division/${division.parent_division_id}`);
                 const district = districtResponse.data.data;
                 setSelectedProvince(prev => prev !== district.parent_division_id ? district.parent_division_id : prev);
                 setSelectedDistrict(prev => prev !== division.parent_division_id ? division.parent_division_id : prev);
                 setSelectedVsDivision(prev => prev !== division._id ? division._id : prev);
               } else if (division.division_type === 'LDI') {
-                const vsResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${division.parent_division_id}`);
+                const vsResponse = await axios.get(`/api/admin/administrative_division/${division.parent_division_id}`);
                 const vsDivision = vsResponse.data.data;
-                const districtResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${vsDivision.parent_division_id}`);
+                const districtResponse = await axios.get(`/api/admin/administrative_division/${vsDivision.parent_division_id}`);
                 const district = districtResponse.data.data;
                 setSelectedProvince(prev => prev !== district.parent_division_id ? district.parent_division_id : prev);
                 setSelectedDistrict(prev => prev !== vsDivision.parent_division_id ? vsDivision.parent_division_id : prev);
@@ -254,7 +254,7 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
         if (!initialData.division_id) return;
         const divisionId = typeof initialData.division_id === 'object' ? initialData.division_id._id : initialData.division_id;
         try {
-          const response = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${divisionId}`);
+          const response = await axios.get(`/api/admin/administrative_division/${divisionId}`);
           const division = response.data.data;
           if (!division) return;
           if (division.division_type === 'PD') {
@@ -263,15 +263,15 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
             setSelectedProvince(division.parent_division_id);
             setSelectedDistrict(division._id);
           } else if (division.division_type === 'VS') {
-            const districtResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${division.parent_division_id}`);
+            const districtResponse = await axios.get(`/api/admin/administrative_division/${division.parent_division_id}`);
             const district = districtResponse.data.data;
             setSelectedProvince(district.parent_division_id);
             setSelectedDistrict(division.parent_division_id);
             setSelectedVsDivision(division._id);
           } else if (division.division_type === 'LDI') {
-            const vsResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${division.parent_division_id}`);
+            const vsResponse = await axios.get(`/api/admin/administrative_division/${division.parent_division_id}`);
             const vsDivision = vsResponse.data.data;
-            const districtResponse = await axios.get(`${API_BASE_URL}/api/admin/administrative_division/${vsDivision.parent_division_id}`);
+            const districtResponse = await axios.get(`/api/admin/administrative_division/${vsDivision.parent_division_id}`);
             const district = districtResponse.data.data;
             setSelectedProvince(district.parent_division_id);
             setSelectedDistrict(vsDivision.parent_division_id);
@@ -301,7 +301,7 @@ const EditUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
         }
         // Update existing user using userId
         const userIdToUpdate = userId || initialData._id;
-        await axios.put(`${API_BASE_URL}/api/admin/users/${userIdToUpdate}`, dataToSend);
+        await axios.put(`/api/admin/users/${userIdToUpdate}`, dataToSend);
         setSuccess('User updated successfully!');
         if (onEditComplete) {
           onEditComplete();
