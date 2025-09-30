@@ -99,7 +99,7 @@ app.use('/api/admin/administrative_division', adminAdministrativeDivisionRoute);
 app.use('/api/admin/user_roles', adminUserRoleRoute);
 
 // ----------------- Serve React Frontend -----------------
-const frontendBuildPath = path.join(__dirname, '../frontend/build');
+const frontendBuildPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendBuildPath));
 
 // Catch-all for React (any route NOT starting with /api)
