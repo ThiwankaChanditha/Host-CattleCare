@@ -36,7 +36,7 @@ export default function AIRecordModal({ isOpen, onClose, farmId, animals, onAddS
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/ldi/ai', {
+      const response = await axios.post('/api/ldi/ai', {
         farm_id: farmId,
         ...formData
       }, {
