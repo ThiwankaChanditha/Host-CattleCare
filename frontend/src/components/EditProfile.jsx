@@ -120,11 +120,11 @@ export default function EditProfile() {
             <div className="w-full max-w-6xl bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-row">
 
                 {/* Sidebar / Left Panel */}
-                <div className="w-1/3 bg-gradient-to-b from-blue-500 to-green-500 text-white rounded-l-2xl p-10 flex flex-col justify-center items-center">
+                {/* <div className="w-1/3 bg-gradient-to-b from-blue-500 to-green-500 text-white rounded-l-2xl p-10 flex flex-col justify-center items-center">
                     <UserCircle2Icon className="h-24 w-24 mb-6" />
                     <h3 className="text-3xl font-bold">{t.editProfile}</h3>
                     <p className="mt-3 text-sm opacity-90 text-center">Update your demographic details to personalize your experience.</p>
-                </div>
+                </div> */}
 
                 {/* Main Form / Right Panel */}
                 <div className="w-2/3 p-10">
