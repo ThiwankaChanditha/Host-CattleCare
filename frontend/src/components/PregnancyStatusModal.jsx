@@ -22,7 +22,7 @@ export default function PregnancyStatusModal({ isOpen, onClose, aiRecord, onUpda
     setError('');
 
     try {
-      const response = await axios.put(`http://localhost:5000/api/ldi/ai/${aiRecord._id}/pregnancy-status`, {
+      const response = await axios.put(`/api/ldi/ai/${aiRecord._id}/pregnancy-status`, {
         pregnancy_status: pregnancyStatus
       }, {
         headers: {
