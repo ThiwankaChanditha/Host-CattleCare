@@ -167,9 +167,9 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
           </div>
           <button
             onClick={onClose}
-            className="p-3 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <XIcon className="w-5 h-5 text-gray-500" />
+            className="relative z-50 p-3 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close modal">
+            <XIcon className="w-6 h-6 text-gray-500" />
           </button>
         </div>
 
