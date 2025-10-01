@@ -61,10 +61,6 @@ export default function Sidebar() {
     icon: FileTextIcon,
     label: "Reports",
     url: "/ldi/reports"
-  }, {
-    icon: Settings2Icon,
-    label: "Settings",
-    url: "/ldi/settings"
   }];
 
   
