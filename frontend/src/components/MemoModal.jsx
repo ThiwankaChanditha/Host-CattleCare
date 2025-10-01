@@ -35,7 +35,7 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
   const fetchMemos = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/ldi/memos', {
+      const response = await axios.get('/api/ldi/memos', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -55,8 +55,8 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
     e.preventDefault();
     try {
       const url = editingMemo 
-        ? `http://localhost:5000/api/ldi/memos/${editingMemo._id}`
-        : 'http://localhost:5000/api/ldi/memos';
+        ? `/api/ldi/memos/${editingMemo._id}`
+        : '/api/ldi/memos';
       
       const method = editingMemo ? 'put' : 'post';
       
@@ -94,7 +94,7 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
     if (!window.confirm('Are you sure you want to delete this memo?')) return;
     
     try {
-      const response = await axios.delete(`http://localhost:5000/api/ldi/memos/${memoId}`, {
+      const response = await axios.delete(`/api/ldi/memos/${memoId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -113,7 +113,7 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
   const handleStatusToggle = async (memo) => {
     try {
       const newStatus = memo.status === 'pending' ? 'completed' : 'pending';
-      const response = await axios.put(`http://localhost:5000/api/ldi/memos/${memo._id}`, {
+      const response = await axios.put(`/api/ldi/memos/${memo._id}`, {
         ...memo,
         status: newStatus
       }, {
