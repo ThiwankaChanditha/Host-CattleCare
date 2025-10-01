@@ -11,9 +11,9 @@ export default function ProgramInfoModal({ isOpen, onClose, program }) {
           <h2 className="text-xl font-semibold text-gray-900">Program Details</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XIcon className="w-5 h-5" />
+            className="relative z-50 p-3 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close modal">
+            <XIcon className="w-6 h-6 text-gray-500" />
           </button>
         </div>
 
