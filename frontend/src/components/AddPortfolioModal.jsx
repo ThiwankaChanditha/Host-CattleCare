@@ -52,7 +52,7 @@ export default function AddPortfolioModal({ isOpen, onClose, onSuccess }) {
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/programs', formData, {
+      const response = await axios.post('/api/programs', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
