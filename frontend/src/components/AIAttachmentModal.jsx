@@ -21,7 +21,7 @@ export default function AIAttachmentModal({ isOpen, onClose, aiRecord }) {
   const fetchAttachments = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/ldi/ai/${aiRecord._id}/attachments`, {
+      const response = await axios.get(`/api/ldi/ai/${aiRecord._id}/attachments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ export default function AIAttachmentModal({ isOpen, onClose, aiRecord }) {
       formData.append('file', selectedFile);
       formData.append('description', description);
 
-      const response = await axios.post(`http://localhost:5000/api/ldi/ai/${aiRecord._id}/attachments`, formData, {
+      const response = await axios.post(`/api/ldi/ai/${aiRecord._id}/attachments`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -88,7 +88,7 @@ export default function AIAttachmentModal({ isOpen, onClose, aiRecord }) {
     }
 
     try {
-      await axios.delete(`http://localhost:5000/api/ldi/ai/${aiRecord._id}/attachments/${attachmentId}`, {
+      await axios.delete(`/api/ldi/ai/${aiRecord._id}/attachments/${attachmentId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -106,7 +106,7 @@ export default function AIAttachmentModal({ isOpen, onClose, aiRecord }) {
     try {
       // Use the new download route with authentication
       const response = await axios.get(
-        `http://localhost:5000/api/ldi/ai/${aiRecord._id}/attachments/${attachment._id}/download`,
+        `/api/ldi/ai/${aiRecord._id}/attachments/${attachment._id}/download`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
