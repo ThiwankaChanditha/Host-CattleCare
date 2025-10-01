@@ -64,7 +64,7 @@ export default function EditProfile() {
             }
             try {
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                const response = await axios.get(`${API_BASE_URL}/api/farmer/profile`, config);
+                const response = await axios.get(`/api/farmer/profile`, config);
                 setFormData(response.data);
             } catch (err) {
                 setError(t.failedToLoad);
@@ -91,7 +91,7 @@ export default function EditProfile() {
         }
         try {
             const config = { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
-            await axios.put(`${API_BASE_URL}/api/farmer/profile`, formData, config);
+            await axios.put(`/api/farmer/profile`, formData, config);
             alert(t.updateSuccess);
             navigate("/farmer/profile");
         } catch (err) {
