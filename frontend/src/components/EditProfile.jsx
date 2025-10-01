@@ -117,17 +117,8 @@ export default function EditProfile() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6 py-10">
-            <div className="w-full max-w-6xl bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-row">
-
-                {/* Sidebar / Left Panel */}
-                <div>
-                    {/* <UserCircle2Icon className="h-24 w-24 mb-6" />
-                    <h3 className="text-3xl font-bold">{t.editProfile}</h3>
-                    <p className="mt-3 text-sm opacity-90 text-center">Update your demographic details to personalize your experience.</p> */}
-                </div>
-
-                {/* Main Form / Right Panel */}
-                <div className="w-2/3 p-10">
+            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg border border-gray-100">
+                <div className="p-10">
                     <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
                         <CustomInput id="age" label={t.age} value={formData.age} onChange={handleChange} type="number" />
                         <CustomInput id="gender" label={t.gender} value={formData.gender} onChange={handleChange} options={genderOptions} />

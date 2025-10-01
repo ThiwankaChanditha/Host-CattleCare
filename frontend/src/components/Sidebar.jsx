@@ -337,7 +337,7 @@ export default function Sidebar() {
                             <div className="flex justify-center mb-6">
                                 <div className="relative">
                                     <img
-                                        src={user?.profileImage ? `/api/${user.profileImage}` : Logo}
+                                        src={user?.profileImage ? `/api/uploads/profile/${user.profileImage}` : Logo}
                                         alt="Current Profile"
                                         className="w-24 h-24 rounded-full object-cover border-4 border-gray-100 shadow-md"
                                     />
