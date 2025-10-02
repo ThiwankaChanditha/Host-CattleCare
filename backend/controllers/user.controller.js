@@ -146,13 +146,18 @@ const createUser = async (req, res) => {
   if (user.is_active === undefined) user.is_active = true;
 
   try {
-    const role = await UserRole.findOne({ role_name: user.role_name });
+    console.log("Looking for role_name:", user.role_name);
+    const role = await UserRole.findOne({ role_name: new RegExp(user.role_name.trim()) });
     if (!role) return res.status(400).json({ success: false, message: 'Invalid role_name provided' });
 
     user.role_id = role._id;
     delete user.role_name;
 
     if (user.division_id === '') user.division_id = undefined;
+
+
+    user.password_hash = "password";
+
 
     const newUser = new User(user);
     await newUser.save();
@@ -175,7 +180,9 @@ const updatedUser = async (req, res) => {
   }
 
   try {
-    const role = await UserRole.findOne({ role_name: user.role_name });
+    console.log("Received role_name:", user.role_name);
+    const role = await UserRole.findOne({ role_name: new RegExp(user.role_name.trim()) });
+    console.log("Found role:", role);
     if (!role) return res.status(400).json({ success: false, message: 'Invalid role_name provided' });
 
     user.role_id = role._id;
