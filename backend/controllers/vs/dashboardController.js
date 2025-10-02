@@ -57,6 +57,8 @@ exports.getDashboardData = async (req, res) => {
             parent_division_id: vsDivisionId
         }).select('_id division_type').lean();
 
+        console.log("child divisions: ", childDivisions);
+
         const farmerDivisionIds = childDivisions
             .filter(div => div.division_type === 'GN')
             .map(div => div._id);
