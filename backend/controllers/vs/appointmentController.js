@@ -1,578 +1,356 @@
-const Appointment = require('../../models/Appointments');
-const User = require('../../models/users');
-const Farm = require('../../models/farms');
+// backend/controllers/vs/dashboardController.js
 const Animal = require('../../models/animals');
+const AnimalHealthRecord = require('../../models/animal_health_records');
+const Farm = require('../../models/farms');
+const Farmer = require('../../models/farmers');
+const User = require('../../models/users');
 const AdministrativeDivision = require('../../models/administrative_divisions');
 const UserRole = require('../../models/user_roles');
+const mongoose = require('mongoose');
+const Appointments = require('../../models/Appointments');
 
-const getAuthenticatedVeterinaryId = (req) => {
-    if (req.user && req.user._id) {
-        console.log('DEBUG: Authenticated VS ID from req.user:', req.user._id);
-        return req.user._id;
-    }
-    console.warn('WARNING: req.user._id not found. Ensure authentication middleware is set up correctly.');
-    return null;
-};
+const bcrypt = require('bcryptjs');
 
-const getAuthenticatedUserId = (req) => {
-    return req.user ? req.user.id : null;
-};
-
-exports.getAppointments = async (req, res) => {
-    console.log('DEBUG: Entering getAppointments controller.');
+const safeToISOString = (dateValue) => {
     try {
-        const veterinaryId = getAuthenticatedVeterinaryId(req);
-        if (!veterinaryId) {
-            console.error('ERROR: No veterinary ID found for getAppointments.');
-            return res.status(401).json({ message: 'Unauthorized: Veterinary ID missing.' });
+        if (!dateValue) return new Date().toISOString().split('T')[0];
+
+
+        if (dateValue.$date) {
+            const date = new Date(dateValue.$date);
+            return isNaN(date.getTime()) ? new Date().toISOString().split('T')[0] : date.toISOString().split('T')[0];
         }
 
-        console.log(`DEBUG: Fetching appointments for VS ID: ${veterinaryId}`);
-        const appointments = await Appointment.find({ veterinary_id: veterinaryId })
-            .populate('farmer_id', 'full_name')
-            .populate('farm_id', 'farm_name')
-            .lean();
 
-        console.log(`DEBUG: Found ${appointments.length} appointments.`);
-
-        const appointmentsWithDetails = await Promise.all(appointments.map(async (appointment) => {
-            let animalName = appointment.animal_tag;
-            let animalTagId = null;
-            let animalType = null;
-
-            const match = appointment.animal_tag?.match(/^(.+?)\s+\((.+)\)$/);
-            if (match) {
-                animalType = match[1];
-                animalTagId = match[2];
-                console.log("Parsed Type:", animalType);
-                console.log("Parsed Tag ID:", animalTagId);
-            } else {
-                console.log("Format not matched, using raw animal_tag");
-                animalTagId = appointment.animal_tag;
-            }
-
-            let finalAnimalName = appointment.animal_tag;
-            if (appointment.farm_id && animalTagId) {
-                const animal = await Animal.findOne({ 
-                    animal_tag: animalTagId, 
-                    farm_id: appointment.farm_id._id 
-                });
-                if (animal) {
-                    finalAnimalName = `${animal.animal_type} (${animal.animal_tag})`;
-                    console.log(`DEBUG: Animal found for tag ${animalTagId}: ${finalAnimalName}`);
-                } else {
-                    console.log(`DEBUG: Animal with tag ${animalTagId} not found in farm ${appointment.farm_id._id}.`);
-                    finalAnimalName = appointment.animal_tag;
-                }
-            }
-
-            const farmerName = appointment.farmer_id ? appointment.farmer_id.full_name : 'Unknown Farmer';
-            const farmName = appointment.farm_id ? appointment.farm_id.farm_name : 'Unknown Farm';
-            const time = `${String(appointment.hour).padStart(2, '0')}:${String(appointment.minute).padStart(2, '0')}`;
-
-            console.log(`DEBUG: Processing appointment ${appointment._id} - Farmer: ${farmerName}, Farm: ${farmName}, Animal: ${finalAnimalName}`);
-
-            return {
-                ...appointment,
-                animalName: finalAnimalName,
-                farmerName: farmerName,
-                farmName: farmName,
-                time: time,
-                status_flag: appointment.status_flag || appointment.status,
-                farmer_id: appointment.farmer_id,
-                farm_id: appointment.farm_id
-            };
-        }));
-
-        res.status(200).json(appointmentsWithDetails);
-        console.log('DEBUG: getAppointments controller finished successfully.');
+        const date = new Date(dateValue);
+        return isNaN(date.getTime()) ? new Date().toISOString().split('T')[0] : date.toISOString().split('T')[0];
     } catch (error) {
-        console.error('ERROR in getAppointments:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.warn('Date conversion error:', error);
+        return new Date().toISOString().split('T')[0];
     }
 };
 
-
-exports.createAppointment = async (req, res) => {
-    console.log('DEBUG: Entering createAppointment controller.');
-    const { animal_tag, farmer_id, farm_id, date, hour, minute, procedure, notes, status_flag } = req.body;
-    const veterinaryId = getAuthenticatedVeterinaryId(req);
-
-    console.log('DEBUG: Received appointment data:', { animal_tag, farmer_id, farm_id, date, hour, minute, procedure, notes, status_flag: req.body.status_flag });
-    console.log('DEBUG: Authenticated VS ID for creation:', veterinaryId);
-
-    if (!animal_tag || !farmer_id || !farm_id || !date || hour === undefined || minute === undefined || !procedure || !veterinaryId || !status_flag) {
-        console.error('ERROR: Missing required fields for appointment creation.');
-        return res.status(400).json({ message: 'Please enter all required fields.' });
-    }
-
+exports.getDashboardData = async (req, res) => {
     try {
-        const farmerExists = await User.findById(farmer_id);
-        console.log(`DEBUG: Farmer (ID: ${farmer_id}) exists: ${!!farmerExists}`);
-        const farmExists = await Farm.findById(farm_id);
-        console.log(`DEBUG: Farm (ID: ${farm_id}) exists: ${!!farmExists}`);
+        const authenticatedUserId = req.user._id;
+        const authenticatedUserRole = req.user.role;
 
-        const match = animal_tag.match(/^(.+?)\s+\((.+)\)$/);
-        let animalType = null;
-        let animalId = null;
-        if (match) {
-            animalType = match[1];
-            animalId = match[2];
-            console.log("Type:", animalType);
-            console.log("Tag ID:", animalId);
-        } else {
-            console.log("Format not matched");
+        if (!authenticatedUserId) {
+            return res.status(401).json({ message: "User not authenticated or ID missing." });
         }
 
-        const animalExists = await Animal.findOne({ animal_tag: animalId, farm_id: farm_id }); 
-        console.log(`DEBUG: Animal (Tag: ${animal_tag}, Farm: ${farm_id}) exists: ${!!animalExists}`);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
 
-        if (!farmerExists || !farmExists || !animalExists) {
-            let notFoundMessage = [];
-            if (!farmerExists) notFoundMessage.push('Farmer');
-            if (!farmExists) notFoundMessage.push('Farm');
-            if (!animalExists) notFoundMessage.push('Animal');
-            console.error(`ERROR: ${notFoundMessage.join(', ')} not found.`);
-            return res.status(404).json({ message: `${notFoundMessage.join(', ')} not found.` });
+        const userProfile = await User.findById(authenticatedUserId).select('full_name profileImage email division_id').lean();
+        if (!userProfile) {
+            return res.status(404).json({ message: "Authenticated user profile not found. Please log in again." });
         }
 
-        const veterinaryUser = await User.findById(veterinaryId).select('division_id').lean();
-        const farmerUser = await User.findById(farmer_id).select('division_id').lean();
-
-        console.log(`DEBUG: VS Division ID: ${veterinaryUser?.division_id}, Farmer Division ID: ${farmerUser?.division_id}`);
-
-        if (veterinaryUser && farmerUser && veterinaryUser.division_id && farmerUser.division_id) {
-            const farmerGNDivision = await AdministrativeDivision.findById(farmerUser.division_id);
-            console.log(`DEBUG: Farmer GN Division: ${farmerGNDivision?.division_name}, Type: ${farmerGNDivision?.division_type}`);
-
-            const veterinaryDivision = await AdministrativeDivision.findById(veterinaryUser.division_id);
-            console.log(`DEBUG: VS Division: ${veterinaryDivision?.division_name}, Type: ${veterinaryDivision?.division_type}`);
-
-            if (veterinaryDivision && farmerGNDivision && veterinaryDivision.division_type === 'VS' && farmerGNDivision.parent_division_id.toString() !== veterinaryUser.division_id.toString()) {
-                console.warn('WARNING: Farmer is outside the VS\'s direct administrative division (LDI).');
-            } else if (veterinaryDivision && farmerGNDivision && veterinaryDivision.division_type !== 'VS') {
-                console.warn('WARNING: VS division type is not "VS", skipping direct division check.');
-            }
-        } else {
-            console.warn('WARNING: Could not perform division check due to missing user or division IDs.');
+        const vsDivisionId = userProfile.division_id;
+        if (!vsDivisionId) {
+            return res.status(400).json({ message: "User's administrative division not found." });
         }
 
-        const newAppointment = new Appointment({
-            animal_tag,
-            farmer_id,
-            farm_id,
-            date: new Date(date),
-            hour,
-            minute,
-            procedure,
-            notes,
-            status_flag,
-            veterinary_id: veterinaryId
+        const ldiDivisions = await AdministrativeDivision.find({
+            parent_division_id: vsDivisionId,
+            division_type: 'LDI'
+        }).select('_id division_type').lean();
+
+        const ldiDivisionIds = ldiDivisions.map(div => div._id);
+        console.log("LDI divisions: ", ldiDivisionIds);
+
+        const farmerDivisions = await AdministrativeDivision.find({
+            parent_division_id: { $in: ldiDivisionIds },
+            division_type: 'GN'
+        }).select('_id division_type').lean();
+
+        const farmerDivisionIds = farmerDivisions.map(div => div._id);
+        console.log("Farmer divisions under LDI: ", farmerDivisionIds);
+
+        const farmerRole = await UserRole.findOne({ role_name: 'Farmer' });
+        const farmerRoleId = farmerRole ? farmerRole._id : null;
+
+        const ldiRole = await UserRole.findOne({
+            role_name: { $in: ['LDI', 'ldi_officer'] }
         });
-        console.log('DEBUG: New appointment object created:', newAppointment);
+        const ldiRoleId = ldiRole ? ldiRole._id : null;
 
-        const savedAppointment = await newAppointment.save();
-        console.log('DEBUG: Appointment saved successfully. ID:', savedAppointment._id);
-
-        const populatedAppointment = await Appointment.findById(savedAppointment._id)
-            .populate('farmer_id', 'full_name')
-            .populate('farm_id', 'farm_name')
-            .lean();
-        console.log('DEBUG: Populated appointment:', populatedAppointment);
-
-        let animalName = populatedAppointment.animal_tag;
-
-        const animalForDisplay = await Animal.findOne({ animal_tag: populatedAppointment.animal_tag, farm_id: populatedAppointment.farm_id._id });
-        if (animalForDisplay) {
-            animalName = `${animalForDisplay.animal_type} (${animalForDisplay.animal_tag})`;
-        }
-
-        const responsePayload = {
-            ...populatedAppointment,
-            animalName: animalName,
-            farmerName: populatedAppointment.farmer_id.full_name,
-            farmName: populatedAppointment.farm_id.farm_name,
-            time: `${String(populatedAppointment.hour).padStart(2, '0')}:${String(populatedAppointment.minute).padStart(2, '0')}`
-        };
-        console.log('DEBUG: Sending successful createAppointment response:', responsePayload);
-        res.status(201).json(responsePayload);
-
-    } catch (error) {
-        console.error('ERROR in createAppointment:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
-
-exports.updateAppointmentStatus = async (req, res) => {
-    console.log('DEBUG: Entering updateAppointmentStatus controller.');
-    const { id } = req.params;
-    const { status } = req.body;
-    const veterinaryId = getAuthenticatedVeterinaryId(req);
-
-    console.log(`DEBUG: Updating appointment ID: ${id} to status: ${status} by VS ID: ${veterinaryId}`);
-
-    try {
-        const appointment = await Appointment.findOne({ _id: id, veterinary_id: veterinaryId });
-
-        if (!appointment) {
-            console.error(`ERROR: Appointment ID ${id} not found or not authorized for VS ID ${veterinaryId}.`);
-            return res.status(404).json({ message: 'Appointment not found or you are not authorized to update it.' });
-        }
-
-        appointment.status_flag = status;
-        await appointment.save();
-        console.log(`DEBUG: Appointment ID ${id} status updated to ${status}.`);
-
-        res.status(200).json({ message: 'Appointment status updated successfully', appointment });
-        console.log('DEBUG: updateAppointmentStatus controller finished successfully.');
-    } catch (error) {
-        console.error('ERROR in updateAppointmentStatus:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
-
-exports.updateAppointment = async (req, res) => {
-    console.log('DEBUG: Entering updateAppointment controller.');
-    const { id } = req.params;
-    const { animal_tag, farmer_id, farm_id, date, hour, minute, procedure, notes, status_flag } = req.body;
-    const veterinaryId = getAuthenticatedVeterinaryId(req);
-
-    console.log('DEBUG: Received update data:', { animal_tag, farmer_id, farm_id, date, hour, minute, procedure, notes, status_flag });
-    console.log('DEBUG: Authenticated VS ID for update:', veterinaryId);
-
-    if (!animal_tag || !farmer_id || !farm_id || !date || hour === undefined || minute === undefined || !procedure || !veterinaryId || !status_flag) {
-        console.error('ERROR: Missing required fields for appointment update.');
-        return res.status(400).json({ message: 'Please enter all required fields.' });
-    }
-
-    try {
-        const appointment = await Appointment.findOne({ _id: id, veterinary_id: veterinaryId });
-
-        if (!appointment) {
-            console.error(`ERROR: Appointment ID ${id} not found or not authorized for VS ID ${veterinaryId}.`);
-            return res.status(404).json({ message: 'Appointment not found or you are not authorized to update it.' });
-        }
-
-        const farmerExists = await User.findById(farmer_id);
-        const farmExists = await Farm.findById(farm_id);
-
-        const match = animal_tag.match(/^(.+?)\s+\((.+)\)$/);
-        let animalType = null;
-        let animalId = null;
-        if (match) {
-            animalType = match[1];
-            animalId = match[2];
-        }
-
-        const animalExists = await Animal.findOne({ animal_tag: animalId, farm_id: farm_id });
-
-        if (!farmerExists || !farmExists || !animalExists) {
-            let notFoundMessage = [];
-            if (!farmerExists) notFoundMessage.push('Farmer');
-            if (!farmExists) notFoundMessage.push('Farm');
-            if (!animalExists) notFoundMessage.push('Animal');
-            console.error(`ERROR: ${notFoundMessage.join(', ')} not found.`);
-            return res.status(404).json({ message: `${notFoundMessage.join(', ')} not found.` });
-        }
-
-        appointment.animal_tag = animal_tag;
-        appointment.farmer_id = farmer_id;
-        appointment.farm_id = farm_id;
-        appointment.date = new Date(date);
-        appointment.hour = hour;
-        appointment.minute = minute;
-        appointment.procedure = procedure;
-        appointment.notes = notes;
-        appointment.status_flag = status_flag;
-
-        await appointment.save();
-        console.log(`DEBUG: Appointment ID ${id} updated successfully.`);
-
-        const populatedAppointment = await Appointment.findById(id)
-            .populate('farmer_id', 'full_name')
-            .populate('farm_id', 'farm_name')
-            .lean();
-
-        let animalName = populatedAppointment.animal_tag;
-
-        const animalForDisplay = await Animal.findOne({ animal_tag: populatedAppointment.animal_tag, farm_id: populatedAppointment.farm_id._id });
-        if (animalForDisplay) {
-            animalName = `${animalForDisplay.animal_type} (${animalForDisplay.animal_tag})`;
-        }
-
-        const responsePayload = {
-            ...populatedAppointment,
-            animalName: animalName,
-            farmerName: populatedAppointment.farmer_id.full_name,
-            farmName: populatedAppointment.farm_id.farm_name,
-            time: `${String(populatedAppointment.hour).padStart(2, '0')}:${String(populatedAppointment.minute).padStart(2, '0')}`
-        };
-
-        res.status(200).json(responsePayload);
-
-    } catch (error) {
-        console.error('ERROR in updateAppointment:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
-
-exports.deleteAppointment = async (req, res) => {
-    console.log('DEBUG: Entering deleteAppointment controller.');
-    const { id } = req.params;
-    const veterinaryId = getAuthenticatedVeterinaryId(req);
-
-    console.log('Deleting appointment with ID:', id);
-
-    try {
-        console.log(`DEBUG: Authenticated VS ID for deletion: ${veterinaryId}`);
-        console.log(`DEBUG: Attempting to find appointment with ID: ${id} for VS ID: ${veterinaryId}`);
-
-        const appointment = await Appointment.findOne({ _id: id, veterinary_id: veterinaryId });
-
-        if (!appointment) {
-            console.error(`ERROR: Appointment ID ${id} not found or not authorized for VS ID ${veterinaryId}.`);
-            return res.status(404).json({ message: 'Appointment not found or you are not authorized to delete it.' });
-        }
-
-        try {
-            await Appointment.deleteOne({ _id: id, veterinary_id: veterinaryId });
-            console.log(`DEBUG: Appointment ID ${id} deleted successfully.`);
-        } catch (removeError) {
-            console.error(`ERROR removing appointment ID ${id}:`, removeError);
-            console.error('Stack trace:', removeError.stack);
-            return res.status(500).json({ message: 'Error deleting appointment', error: removeError.message, stack: removeError.stack });
-        }
-
-        res.status(200).json({ message: 'Appointment deleted successfully' });
-    } catch (error) {
-        console.error('ERROR in deleteAppointment:', error);
-        res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
-    }
-};
-
-exports.getFarmersAndFarmsForAppointment = async (req, res) => {
-    console.log('DEBUG: Entering getFarmersAndFarmsForAppointment controller.');
-    try {
-        const authenticatedUserId = getAuthenticatedVeterinaryId(req);
-        if (!authenticatedUserId) {
-            console.error('ERROR: No authenticated user ID found for getFarmersAndFarmsForAppointment.');
-            return res.status(401).json({ message: "Unauthorized: User not authenticated or ID missing." });
-        }
-        console.log(`DEBUG: Authenticated VS ID: ${authenticatedUserId}`);
-
-        const veterinaryUser = await User.findById(authenticatedUserId).select('division_id role_id').populate('role_id', 'role_name').lean();
-        if (!veterinaryUser || !veterinaryUser.division_id || veterinaryUser.role_id?.role_name !== 'Veterinary Surgeon') {
-            console.error('ERROR: Unauthorized or not a veterinary user trying to get farmers and farms.');
-            return res.status(403).json({ message: 'Unauthorized or not a veterinary user.' });
-        }
-        console.log(`DEBUG: VS role: ${veterinaryUser.role_id.role_name}, Division ID: ${veterinaryUser.division_id}`);
-
-        const farmerRole = await UserRole.findOne({ role_name: 'Farmer' });
-        if (!farmerRole) {
-            console.error('ERROR: Farmer role not found in the system.');
-            return res.status(500).json({ message: 'Farmer role not found in the system.' });
-        }
-        const farmerRoleId = farmerRole._id;
-        console.log(`DEBUG: Farmer Role ID: ${farmerRoleId}`);
-
-        const vsAdministrativeDivision = await AdministrativeDivision.findById(veterinaryUser.division_id).lean();
-        if (!vsAdministrativeDivision) {
-            console.error('ERROR: VS administrative division not found.');
-            return res.status(500).json({ message: 'VS administrative division not found.' });
-        }
-        console.log(`DEBUG: VS Administrative Division Type: ${vsAdministrativeDivision.division_type}`);
-
-
-        let farmerDivisionIds = [];
-        if (vsAdministrativeDivision.division_type === 'VS') {
-            const childGNDivisions = await AdministrativeDivision.find({
-                parent_division_id: veterinaryUser.division_id,
-                division_type: 'GN'
+        let dynamicTotalFarmersCount = 0;
+        let farmerIds = [];
+        if (farmerRoleId) {
+            const farmers = await User.find({
+                division_id: { $in: farmerDivisionIds },
+                role_id: farmerRoleId
             }).select('_id').lean();
-            farmerDivisionIds = childGNDivisions.map(div => div._id);
-            console.log(`DEBUG: Found ${farmerDivisionIds.length} child GN divisions for VS.`);
-        } else if (vsAdministrativeDivision.division_type === 'GN') {
-            farmerDivisionIds = [vsAdministrativeDivision._id];
-            console.log(`DEBUG: VS is directly in a GN division. Using its own GN division ID.`);
-        } else {
-            console.warn('WARNING: VS division type is not "VS" or "GN". Cannot determine relevant farmer divisions.');
-            return res.status(200).json([]); 
+
+            const farmerUserIds = farmers.map(f => f._id);
+
+            const farmerDocs = await Farmer.find({
+                user_id: { $in: farmerUserIds }
+            }).select('_id user_id').lean();
+
+            farmerIds = farmerDocs.map(f => f._id);
+            dynamicTotalFarmersCount = farmerDocs.length;
         }
+        console.log("Dynamic Total Farmers Count:", dynamicTotalFarmersCount);
 
-
-        if (farmerDivisionIds.length === 0) {
-            console.log('DEBUG: No relevant GN divisions found for this VS. Returning empty farmer list.');
-            return res.status(200).json([]);
-        }
-
-        const farmers = await User.find({
-            role_id: farmerRoleId,
+        const farmsInFarmerDivisions = await Farm.countDocuments({
             division_id: { $in: farmerDivisionIds }
-        }).select('_id full_name').lean();
-        console.log(`DEBUG: Found ${farmers.length} farmers in relevant divisions.`);
+        });
 
-        const farmersWithFarms = await Promise.all(farmers.map(async (farmer) => {
-            const farms = await Farm.find({ registered_by: farmer._id })
-                .select('_id farm_name')
-                .lean();
-            console.log(`DEBUG: Farmer ${farmer.full_name} (ID: ${farmer._id}) has ${farms.length} farms.`);
+        let totalLdiCount = 0;
+        if (ldiRoleId) {
+            totalLdiCount = await User.countDocuments({
+                division_id: { $in: ldiDivisionIds },
+                role_id: ldiRoleId
+            });
+        }
+
+        const farmsByFarmers = await Farm.find({
+            farmer_id: { $in: farmerIds }
+        }).select('_id farmer_id').lean();
+
+
+        const totalFarmsByFarmers = farmsByFarmers.length;
+        console.log("Total Farms Owned by Farmers (by farmer_id):", totalFarmsByFarmers);
+
+        const farmIdsOwnedByFarmers = farmsByFarmers.map(farm => farm._id);
+
+        const totalAnimalsByFarmers = await Animal.countDocuments({
+            farm_id: { $in: farmIdsOwnedByFarmers },
+            current_status: 'Active'
+        });
+        console.log("Total Animals in Farms Owned by Farmers (by farm_id):", totalAnimalsByFarmers);
+
+        const vsSpecificHealthRecords = await AnimalHealthRecord.find({ treated_by: authenticatedUserId })
+            .populate({
+                path: 'animal_id',
+                select: 'animal_tag animal_type current_status farm_id',
+                populate: {
+                    path: 'farm_id',
+                    select: 'farm_name'
+                }
+            })
+            .lean();
+
+        const appointmentsRaw = await Appointments.find({
+            veterinary_id: authenticatedUserId,
+            date: { $gte: today, $lt: tomorrow },
+        })
+            .populate('farm_id', 'farm_name')
+            .lean();
+
+        const todaysAppointments = appointmentsRaw.map(app => {
+            const hour = app.hour !== undefined ? app.hour : 0;
+            const minute = app.minute !== undefined ? app.minute : 0;
+            const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
             return {
-                _id: farmer._id,
-                full_name: farmer.full_name,
-                farms: farms
+                id: app._id.toString(),
+                date: app.date.toISOString().split('T')[0],
+                time: timeString,
+                animalName: app.animal_tag,
+                animalId: app.animal_tag,
+                farm: app.farm_id ? app.farm_id.farm_name : 'N/A',
+                procedure: app.procedure || 'N/A',
+                status: app.status_flag || 'Scheduled',
+                vs_id: authenticatedUserId.toString()
             };
+        });
+
+        const pendingValidations = vsSpecificHealthRecords.filter(rec => rec.recovery_status === 'Ongoing').map(rec => ({
+            id: rec._id.toString(),
+            type: 'Health Record Validation',
+            animalName: rec.animal_id?.animal_tag || 'N/A',
+            animalId: rec.animal_id?._id?.toString() || 'N/A',
+            date: safeToISOString(rec.created_at),
+            issue: rec.health_issue,
+            farm: rec.animal_id?.farm_id?.farm_name || 'N/A'
         }));
 
-        res.status(200).json(farmersWithFarms);
-        console.log('DEBUG: getFarmersAndFarmsForAppointment controller finished successfully.');
+        const affectedAnimals = vsSpecificHealthRecords.filter(record => record.recovery_status === 'Ongoing');
+        const formattedAffectedAnimals = affectedAnimals.map(record => ({
+            id: record._id.toString(),
+            animalName: record.animal_id?.animal_tag || 'N/A',
+            animalType: record.animal_id?.animal_type || 'N/A',
+            farm: record.animal_id?.farm_id?.farm_name || 'N/A',
+            condition: record.health_issue,
+            status: 'Ongoing',
+            dateReported: safeToISOString(record.created_at)
+        }));
+
+        const recoveringAnimals = vsSpecificHealthRecords.filter(record => record.recovery_status === 'Recovered');
+        const formattedRecoveringAnimals = recoveringAnimals.map(record => ({
+            id: record._id.toString(),
+            animalName: record.animal_id?.animal_tag || 'N/A',
+            animalId: record.animal_id?._id?.toString() || 'N/A',
+            farm: record.animal_id?.farm_id?.farm_name || 'N/A',
+            condition: record.health_issue,
+            recoveryStage: 'Recovered',
+            dateStarted: safeToISOString(record.created_at)
+        }));
+
+        const farmsManagedByVS = await Farm.find({
+            $or: [
+                { registered_by: authenticatedUserId },
+                { veterinarians_assigned: authenticatedUserId }
+            ]
+        });
+
+        const farmIdsManagedByVS = farmsManagedByVS.map(farm => farm._id);
+        const activeFarmsCount = farmsManagedByVS.filter(farm => farm.is_active).length;
+
+        const totalCattleInFarmerFarms = await Animal.countDocuments({
+            farm_id: { $in: farmIdsOwnedByFarmers },
+            animal_type: 'Cattle',
+            current_status: 'Active'
+        });
+
+        console.log("Total Cattle in Farms Owned by Farmers:", totalCattleInFarmerFarms);
+
+        const totalBuffaloInVSRelatedFarms = await Animal.countDocuments({
+            farm_id: { $in: farmIdsManagedByVS },
+            animal_type: 'Buffalo',
+            current_status: 'Active'
+        });
+
+        const avgProduction = 0;
+
+        const areaStats = {
+            activeFarms: totalFarmsByFarmers,
+            totalCattle: totalCattleInFarmerFarms,
+            totalBuffalo: totalBuffaloInVSRelatedFarms,
+            totalAnimals: totalAnimalsByFarmers,
+            avgProduction: avgProduction,
+            ldiCount: totalLdiCount,
+            activeProjects: 8,
+            totalFarmers: dynamicTotalFarmersCount,
+            totalFarmsManagedByFarmers: farmsInFarmerDivisions,
+            totalFarmsOwnedByFarmers: totalFarmsByFarmers,
+            totalAnimalsInFarmerFarms: totalAnimalsByFarmers
+        };
+
+        res.status(200).json({
+            userProfile: {
+                name: userProfile.full_name,
+                email: userProfile.email,
+                profileImage: userProfile.profileImage
+            },
+            areaStats,
+            appointments: todaysAppointments,
+            pendingValidations,
+            affectedAnimals: formattedAffectedAnimals,
+            recoveringAnimals: formattedRecoveringAnimals,
+        });
+
     } catch (error) {
-        console.error('ERROR in getFarmersAndFarmsForAppointment:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error("Error fetching dashboard data in DashboardController:", error);
+        res.status(500).json({ message: "Internal server error occurred while fetching dashboard data.", error: error.message });
     }
 };
 
-exports.getAnimalsByFarmId = async (req, res) => {
-    console.log('DEBUG: Entering getAnimalsByFarmId controller.');
+
+exports.getUserSettings = async (req, res) => {
     try {
-        const { farmId } = req.params;
-        const authenticatedUserId = getAuthenticatedUserId(req); 
+        const userId = req.user._id;
+        const user = await User.findById(userId).select('full_name email contact_number area created_at address division_id').lean();
+        const divData = await AdministrativeDivision.findOne({ _id: user.division_id }).select('division_type  division_name').lean();
 
-        if (!authenticatedUserId) {
-            console.error('ERROR: No authenticated user ID found for getAnimalsByFarmId.');
-            return res.status(401).json({ message: "Unauthorized: User not authenticated." });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
-
-        console.log(`DEBUG: Authenticated User ID: ${authenticatedUserId}. Attempting to fetch animals for Farm ID: ${farmId}`);
-
-        const farm = await Farm.findById(farmId).select('registered_by gn_division_id').lean();
-        if (!farm) {
-            console.error(`ERROR: Farm ID ${farmId} not found.`);
-            return res.status(404).json({ message: 'Farm not found.' });
-        }
-        console.log(`DEBUG: Found Farm ${farmId}, registered by User ID: ${farm.registered_by}, in GN Division ID: ${farm.gn_division_id}`);
-
-        const animals = await Animal.find({ farm_id: farmId }).select('_id animal_tag animal_type category gender').lean();
-        console.log(`DEBUG: Found ${animals.length} animals for farm ${farmId}.`);
-        res.status(200).json(animals);
-        console.log('DEBUG: getAnimalsByFarmId controller finished successfully.');
+        res.status(200).json({ user, divData });
     } catch (error) {
-        console.error('ERROR in getAnimalsByFarmId:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Error fetching user settings:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-exports.getFarmersByVeterinaryDivision = async (req, res) => {
-    console.log('DEBUG: Entering getFarmersByVeterinaryDivision controller.');
+exports.updateUserSettings = async (req, res) => {
     try {
-        const veterinaryId = getAuthenticatedVeterinaryId(req);
-        if (!veterinaryId) {
-            return res.status(401).json({ message: "Unauthorized: User not authenticated or ID missing." });
-        }
-        console.log(`DEBUG: Fetching farmers for VS ID: ${veterinaryId}'s division.`);
+        const userId = req.user._id;
+        const { full_name, email, contact_number } = req.body;
 
-        const veterinaryUser = await User.findById(veterinaryId).select('role_id division_id').populate('role_id', 'role_name').lean();
-
-        if (!veterinaryUser || veterinaryUser.role_id?.role_name !== 'veterinarian') {
-            console.error('ERROR: Unauthorized or not a veterinary user trying to get farmers by division.');
-            return res.status(403).json({ message: 'Unauthorized or not a veterinary user.' });
-        }
-        console.log(`DEBUG: VS role: ${veterinaryUser.role_id.role_name}, Division ID: ${veterinaryUser.division_id}`);
-
-        const farmerRole = await UserRole.findOne({ role_name: 'Farmer' });
-        if (!farmerRole) {
-            console.error('ERROR: Farmer role not found.');
-            return res.status(500).json({ message: 'Farmer role not found in the system.' });
-        }
-        const farmerRoleId = farmerRole._id;
-
-        const vsAdministrativeDivision = await AdministrativeDivision.findById(veterinaryUser.division_id).lean();
-        if (!vsAdministrativeDivision) {
-            console.error('ERROR: VS administrative division not found.');
-            return res.status(500).json({ message: 'VS administrative division not found.' });
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        let farmerDivisionIds = [];
+        if (full_name) user.full_name = full_name;
+        if (email) user.email = email;
+        if (contact_number) user.contact_number = contact_number;
 
-        if (vsAdministrativeDivision.division_type === 'VS') {
-            const childGNDivisions = await AdministrativeDivision.find({
-                parent_division_id: veterinaryUser.division_id,
-                division_type: 'GN'
-            }).select('_id').lean();
-            farmerDivisionIds = childGNDivisions.map(div => div._id);
-        } else if (vsAdministrativeDivision.division_type === 'GN') {
-            farmerDivisionIds = [vsAdministrativeDivision._id];
-        } else {
-            console.warn('WARNING: VS division type is not "VS" or "GN". Returning empty farmer list.');
-            return res.status(200).json([]);
-        }
+        await user.save();
 
-        const farmers = await User.find({
-            role_id: farmerRoleId,
-            division_id: { $in: farmerDivisionIds }
-        }).select('_id full_name email').lean(); 
-        console.log(`DEBUG: Found ${farmers.length} farmers in VS's child GN divisions.`);
-        res.status(200).json(farmers);
-        console.log('DEBUG: getFarmersByVeterinaryDivision controller finished successfully.');
+        res.status(200).json({ message: 'User profile updated successfully' });
     } catch (error) {
-        console.error('ERROR in getFarmersByVeterinaryDivision:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Error updating user settings:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-exports.getFarmsByFarmerId = async (req, res) => {
-    console.log('DEBUG: Entering getFarmsByFarmerId controller.');
+
+
+exports.updateUserPassword = async (req, res) => {
     try {
-        const { farmerId } = req.params; 
-        const veterinaryId = getAuthenticatedVeterinaryId(req);
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id;
 
-        if (!veterinaryId) {
-            console.error("ERROR: Unauthorized: User not authenticated or ID missing for VS.");
-            return res.status(401).json({ message: "Unauthorized: User not authenticated or ID missing." });
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                message: 'Current password and new password are required'
+            });
+        }
+        const user = await User.findById(userId).select('password_hash');
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
         }
 
-        console.log(`DEBUG: Attempting to fetch farms registered by User ID: ${farmerId} for VS ID: ${veterinaryId}`);
+        console.log('Updating password for user:', user);
 
-        const farmerUser = await User.findById(farmerId).select('division_id').lean();
-        if (!farmerUser) {
-            console.error(`ERROR: Farmer User ID ${farmerId} not found.`);
-            return res.status(404).json({ message: 'Farmer user account not found.' });
-        }
-        console.log(`DEBUG: Found farmer user with division_id: ${farmerUser.division_id}`);
+        console.log('User found:', user._id);
+        console.log('Password field exists:', !!user.password_hash);
+        console.log('Current password provided:', !!currentPassword);
 
-        const veterinaryUser = await User.findById(veterinaryId).select('division_id role_id').populate('role_id', 'role_name').lean();
-        if (!veterinaryUser || veterinaryUser.role_id?.role_name !== 'veterinarian') {
-            console.error('ERROR: Unauthorized: User is not a Veterinary Surgeon or not found.');
-            return res.status(403).json({ message: 'Unauthorized or not a veterinary user.' });
-        }
-        console.log(`DEBUG: Authenticated VS with division_id: ${veterinaryUser.division_id}`);
-
-
-        const vsAdministrativeDivision = await AdministrativeDivision.findById(veterinaryUser.division_id).lean();
-        const farmerGNDivision = await AdministrativeDivision.findById(farmerUser.division_id).lean(); 
-
-        let isAuthorized = false;
-        if (vsAdministrativeDivision && farmerGNDivision) {
-            if (vsAdministrativeDivision.division_type === 'VS' && farmerGNDivision.parent_division_id && farmerGNDivision.parent_division_id.toString() === vsAdministrativeDivision._id.toString()) {
-                isAuthorized = true;
-                console.log('DEBUG: Authorization granted: VS (VS type) is parent of farmer\'s GN division.');
-            }
-            else if (vsAdministrativeDivision.division_type === 'GN' && farmerGNDivision._id.toString() === vsAdministrativeDivision._id.toString()) {
-                isAuthorized = true;
-                console.log('DEBUG: Authorization granted: VS (GN type) is in the same GN division as farmer.');
-            }
+        if (!user.password_hash) {
+            return res.status(400).json({
+                message: 'No password set for this account. Please contact administrator.'
+            });
         }
 
-        if (!isAuthorized) {
-            console.error(`ERROR: VS ID ${veterinaryId} not authorized to access farms for farmer user ID ${farmerId} based on division match.`);
-            return res.status(403).json({ message: 'You are not authorized to view farms for this farmer.' });
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password_hash);
+
+        if (!isCurrentPasswordValid) {
+            return res.status(400).json({
+                message: 'Current password is incorrect'
+            });
         }
 
-        const farms = await Farm.find({ registered_by: farmerId }).select('_id farm_name location_address').lean(); 
-        console.log(`DEBUG: Found ${farms.length} farms registered by user ${farmerId}.`);
-        res.status(200).json(farms);
-        console.log('DEBUG: getFarmsByFarmerId controller finished successfully.');
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                message: 'New password must be at least 6 characters long'
+            });
+        }
+
+        const saltRounds = 12;
+        user.password_hash = await bcrypt.hash(newPassword, saltRounds);
+
+        await user.save()
+
+        res.status(200).json({
+            message: 'Password updated successfully'
+        });
+
     } catch (error) {
-        console.error('ERROR in getFarmsByFarmerId:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Error updating user password:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };

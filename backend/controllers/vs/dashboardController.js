@@ -63,6 +63,8 @@ exports.getDashboardData = async (req, res) => {
             .filter(div => div.division_type === 'GN')
             .map(div => div._id);
 
+        console.log("farmer divisions: ", farmerDivisionIds);
+
         const ldiDivisionIds = childDivisions
             .filter(div => div.division_type === 'LDI')
             .map(div => div._id);
@@ -70,7 +72,7 @@ exports.getDashboardData = async (req, res) => {
         const farmerRole = await UserRole.findOne({ role_name: 'Farmer' });
         const farmerRoleId = farmerRole ? farmerRole._id : null;
 
-        const ldiRole = await UserRole.findOne({ role_name: 'Livestock Development Instructor' });
+        const ldiRole = await UserRole.findOne({ role_name: 'ldi_officer' });
         const ldiRoleId = ldiRole ? ldiRole._id : null;
 
         let dynamicTotalFarmersCount = 0;
