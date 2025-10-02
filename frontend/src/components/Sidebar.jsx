@@ -6,7 +6,7 @@ import { useSidebar } from '../App';
 import React, { useState } from 'react';
 import {
     LayoutDashboardIcon, BellIcon, FileTextIcon, Settings2Icon,
-    LogOutIcon, Workflow, BadgeInfo, Upload, X, Trash2, ChevronLeft, ChevronRight
+    LogOutIcon, Workflow, BadgeInfo, Upload, X, Trash2, ChevronLeft, ChevronRight, Menu
 } from "lucide-react";
 import Logo from "../assets/avatar.png";
 import axios from 'axios';
@@ -96,6 +96,8 @@ export default function Sidebar() {
 
     const { isCollapsed, setIsCollapsed } = useSidebar();
 
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     console.log("Sidebar Render Cycle:");
     console.log("    Current User object in Sidebar:", user);
     console.log("    Profile Image URL from user object:", user?.profileImage);
@@ -117,6 +119,10 @@ export default function Sidebar() {
 
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
+    };
+
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
     const handleProfileClick = () => {
@@ -226,7 +232,21 @@ export default function Sidebar() {
                 }
             `}</style>
 
-            <div className={`${isCollapsed ? 'w-20' : 'w-64'} h-screen flex flex-col bg-white border-r border-gray-200 fixed top-0 left-0 shadow-lg transition-all duration-300 ease-in-out z-40`}>
+            {/* Mobile hamburger menu button */}
+            <div className="lg:hidden fixed top-4 left-4 z-50">
+                <button
+                    onClick={toggleMobileMenu}
+                    className="p-2 rounded-md bg-white shadow-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    aria-label="Toggle menu"
+                >
+                    <Menu className="w-6 h-6 text-gray-700" />
+                </button>
+            </div>
+
+            {/* Sidebar for desktop and mobile */}
+            <div className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-lg z-40 transition-transform duration-300 ease-in-out
+                ${isCollapsed ? 'w-20' : 'w-64'}
+                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:flex lg:flex-col`}>
                 <div className={`${isCollapsed ? 'p-2 pt-4' : 'p-4 pt-6'} flex flex-col items-center border-b border-gray-200 transition-all duration-300`}>
                     <Link to={userRolePrefix ? `/${userRolePrefix}/dashboard` : "/"} className="flex flex-col items-center group">
                         <div className="relative">

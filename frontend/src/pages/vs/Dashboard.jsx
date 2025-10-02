@@ -114,9 +114,9 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="flex min-h-screen">
-            <div className="flex-1 overflow-auto">
-                <div className="p-6 space-y-6">
+        <div className="min-h-screen lg:ml-64">
+            <div className="overflow-auto">
+                <div className="p-4 lg:p-6 space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h1 className="text-2xl font-semibold text-gray-900">Welcome, {userProfile.name} 👋</h1>
