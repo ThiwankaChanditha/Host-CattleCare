@@ -36,7 +36,7 @@ export default function FarmerDetails() {
         setFarmer(farmerData.data);
 
         // Fetch farms for this farmer
-        const farmsResponse = await fetch(`http://localhost:5000/api/ldi/farmerdetails/${id}/farms`, {
+        const farmsResponse = await fetch(`/api/ldi/farmerdetails/${id}/farms`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

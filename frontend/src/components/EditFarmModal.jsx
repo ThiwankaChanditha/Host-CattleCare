@@ -83,9 +83,9 @@ export default function EditFarmModal({ isOpen, onClose, farm, onUpdateSuccess }
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <XIcon className="w-6 h-6" />
+            className="relative z-50 p-3 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close modal">
+            <XIcon className="w-6 h-6 text-gray-500" />
           </button>
         </div>
 

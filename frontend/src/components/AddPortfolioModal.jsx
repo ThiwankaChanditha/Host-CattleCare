@@ -52,7 +52,7 @@ export default function AddPortfolioModal({ isOpen, onClose, onSuccess }) {
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/programs', formData, {
+      const response = await axios.post('/api/programs', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -95,9 +95,9 @@ export default function AddPortfolioModal({ isOpen, onClose, onSuccess }) {
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Add New Portfolio</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XIcon className="w-6 h-6" />
+            className="relative z-50 p-3 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close modal">
+            <XIcon className="w-6 h-6 text-gray-500" />
           </button>
         </div>
 

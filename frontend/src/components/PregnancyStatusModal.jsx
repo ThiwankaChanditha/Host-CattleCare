@@ -22,7 +22,7 @@ export default function PregnancyStatusModal({ isOpen, onClose, aiRecord, onUpda
     setError('');
 
     try {
-      const response = await axios.put(`http://localhost:5000/api/ldi/ai/${aiRecord._id}/pregnancy-status`, {
+      const response = await axios.put(`/api/ldi/ai/${aiRecord._id}/pregnancy-status`, {
         pregnancy_status: pregnancyStatus
       }, {
         headers: {
@@ -52,9 +52,9 @@ export default function PregnancyStatusModal({ isOpen, onClose, aiRecord, onUpda
           <h2 className="text-xl font-semibold text-gray-900">Update Pregnancy Status</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XIcon className="w-6 h-6" />
+            className="relative z-50 p-3 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close modal">
+            <XIcon className="w-6 h-6 text-gray-500" />
           </button>
         </div>
 
