@@ -273,6 +273,7 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
       if (editMode) {
         // Update existing user
         await axios.put(`/api/admin/users/${initialData._id}`, formData);
+        console.log("form data from user: ", formData);
         setSuccess('User updated successfully!');
         if (onEditComplete) {
           onEditComplete();
