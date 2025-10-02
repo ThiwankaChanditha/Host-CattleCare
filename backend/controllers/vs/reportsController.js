@@ -25,9 +25,18 @@ const getFarmersByVsId = async (req, res) => {
         const vsDivisionId = vsData.division_id;
         console.log('Veterinary Service Division ID:', vsDivisionId);
 
+        // First get LDI divisions under VS
+        const ldiDivisions = await AdministrativeDivision.find({
+            division_type: { $in: ['LDI', 'ldi_officer'] },
+            parent_division_id: vsDivisionId
+        }).select('_id').lean();
+
+        const ldiDivisionIds = ldiDivisions.map(div => div._id);
+
+        // Then get GN divisions under those LDI divisions
         const gnDivisions = await AdministrativeDivision.find({
             division_type: 'GN',
-            parent_division_id: vsDivisionId
+            parent_division_id: { $in: ldiDivisionIds }
         }).lean();
         console.log('GN Divisions:', gnDivisions.length);
 
@@ -86,8 +95,8 @@ const getFarmersByVsId = async (req, res) => {
         const animalIds = animals.map(a => a._id);
         const medicalHistories = await MedicalHistory.find({ animal_id: { $in: animalIds } }).lean();
         console.log('Medical History Records Found:', medicalHistories.length);
-        
-        const medicalHistory = await MedicalHistory.find({treated_by: vsId}).lean();
+
+        const medicalHistory = await MedicalHistory.find({ treated_by: vsId }).lean();
         const medicalDetails = medicalHistories.filter(mh => mh.treated_by.toString() === vsId.toString());
 
         const farmersWithCounts = farmers.map(farmer => {
@@ -271,9 +280,18 @@ const getComprehensiveReportData = async (req, res) => {
         console.log('Veterinary Service Division ID:', vsDivisionId);
 
         // Use the same approach as getFarmersByVsId to find GN divisions
+        // First get LDI divisions under VS
+        const ldiDivisions = await AdministrativeDivision.find({
+            division_type: { $in: ['LDI', 'ldi_officer'] },
+            parent_division_id: vsDivisionId
+        }).select('_id').lean();
+
+        const ldiDivisionIds = ldiDivisions.map(div => div._id);
+
+        // Then get GN divisions under those LDI divisions
         const gnDivisions = await AdministrativeDivision.find({
             division_type: 'GN',
-            parent_division_id: vsDivisionId
+            parent_division_id: { $in: ldiDivisionIds }
         }).lean();
         console.log('GN Divisions:', gnDivisions.length);
 
@@ -378,10 +396,18 @@ const getDiseaseReportData = async (req, res) => {
 
         const vsDivisionId = vsData.division_id;
 
-        // Get GN divisions under this VS
+        // First get LDI divisions under VS
+        const ldiDivisions = await AdministrativeDivision.find({
+            division_type: { $in: ['LDI', 'ldi_officer'] },
+            parent_division_id: vsDivisionId
+        }).select('_id').lean();
+
+        const ldiDivisionIds = ldiDivisions.map(div => div._id);
+
+        // Then get GN divisions under those LDI divisions
         const gnDivisions = await AdministrativeDivision.find({
             division_type: 'GN',
-            parent_division_id: vsDivisionId
+            parent_division_id: { $in: ldiDivisionIds }
         }).lean();
 
         if (!gnDivisions || gnDivisions.length === 0) {
@@ -428,9 +454,9 @@ const getDiseaseReportData = async (req, res) => {
         const animalIds = animals.map(animal => animal._id);
 
         // Get medical histories for disease analysis
-        const medicalHistories = await MedicalHistory.find({ 
+        const medicalHistories = await MedicalHistory.find({
             animal_id: { $in: animalIds },
-            treated_by: vsId 
+            treated_by: vsId
         }).lean();
 
         // Disease summary by diagnosis
@@ -441,9 +467,9 @@ const getDiseaseReportData = async (req, res) => {
 
         medicalHistories.forEach(record => {
             const diagnosis = record.diagnosis || 'Unknown';
-            const monthYear = record.treatment_date ? 
+            const monthYear = record.treatment_date ?
                 new Date(record.treatment_date).toISOString().slice(0, 7) : 'Unknown';
-            
+
             // Disease summary
             if (!diseaseSummary[diagnosis]) {
                 diseaseSummary[diagnosis] = {
