@@ -44,19 +44,18 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
 
   // Helper functions to determine visibility/enabled state of location selectors based on role
   const showProvince = () => {
-    return ['Provincial Director (PD)', 'Regional Director (RD)', 'Veterinary Surgeon (VS)', 'LDI Officer', 'Farmer'].includes(formData.role_name);
+    return ['Director General', 'Provincial Director', 'Regional Director', 'veterinarian', 'ldi_officer', 'Farmer'].includes(formData.role_name);
   };
-
   const showDistrict = () => {
-    return ['Regional Director (RD)', 'Veterinary Surgeon (VS)', 'LDI Officer', 'Farmer'].includes(formData.role_name);
+    return ['Regional Director', 'veterinarian', 'ldi_officer', 'Farmer'].includes(formData.role_name);
   };
 
   const showVsDivision = () => {
-    return ['Veterinary Surgeon (VS)', 'LDI Officer', 'Farmer'].includes(formData.role_name);
+    return ['veterinarian', 'ldi_officer', 'Farmer'].includes(formData.role_name);
   };
 
   const showLdiDivision = () => {
-    return ['LDI Officer', 'Farmer'].includes(formData.role_name);
+    return ['ldi_officer', 'Farmer'].includes(formData.role_name);
   };
 
   const showGnDivision = () => {
@@ -357,11 +356,11 @@ const AddUser = ({ editMode = false, initialData = {}, onEditComplete }) => {
             className="w-full border border-gray-300 rounded-md px-3 py-2"
           >
             <option value="" disabled>Select Role</option>
-            <option value="Assitant Director General(ADG)">Assitant Director General(ADG)</option>
-            <option value="Provincial Director (PD)">Provincial Director (PD)</option>
-            <option value="Regional Director (RD)">Regional Director (RD)</option>
-            <option value="Veterinary Surgeon (VS)">Veterinary Surgeon</option>
-            <option value="LDI Officer">LDI Officer</option>
+            <option value="Director General">Assitant Director General(ADG)</option>
+            <option value="Provincial Director">Provincial Director (PD)</option>
+            <option value="Regional Director">Regional Director (RD)</option>
+            <option value="veterinarian">Veterinary Surgeon</option>
+            <option value="ldi_officer">LDI Officer</option>
             <option value="Farmer">Farmer</option>
           </select>
         </div>
