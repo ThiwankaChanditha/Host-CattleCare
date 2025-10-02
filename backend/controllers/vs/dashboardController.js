@@ -2,6 +2,7 @@
 const Animal = require('../../models/animals');
 const AnimalHealthRecord = require('../../models/animal_health_records');
 const Farm = require('../../models/farms');
+const Farmer = require('../../models/farmers');
 const User = require('../../models/users');
 const AdministrativeDivision = require('../../models/administrative_divisions');
 const UserRole = require('../../models/user_roles');
@@ -53,26 +54,28 @@ exports.getDashboardData = async (req, res) => {
             return res.status(400).json({ message: "User's administrative division not found." });
         }
 
-        const childDivisions = await AdministrativeDivision.find({
-            parent_division_id: vsDivisionId
+        const ldiDivisions = await AdministrativeDivision.find({
+            parent_division_id: vsDivisionId,
+            division_type: 'LDI'
         }).select('_id division_type').lean();
 
-        console.log("child divisions: ", childDivisions);
+        const ldiDivisionIds = ldiDivisions.map(div => div._id);
+        console.log("LDI divisions: ", ldiDivisionIds);
 
-        const farmerDivisionIds = childDivisions
-            .filter(div => div.division_type === 'GN')
-            .map(div => div._id);
+        const farmerDivisions = await AdministrativeDivision.find({
+            parent_division_id: { $in: ldiDivisionIds },
+            division_type: 'GN'
+        }).select('_id division_type').lean();
 
-        console.log("farmer divisions: ", farmerDivisionIds);
-
-        const ldiDivisionIds = childDivisions
-            .filter(div => div.division_type === 'LDI')
-            .map(div => div._id);
+        const farmerDivisionIds = farmerDivisions.map(div => div._id);
+        console.log("Farmer divisions under LDI: ", farmerDivisionIds);
 
         const farmerRole = await UserRole.findOne({ role_name: 'Farmer' });
         const farmerRoleId = farmerRole ? farmerRole._id : null;
 
-        const ldiRole = await UserRole.findOne({ role_name: 'ldi_officer' });
+        const ldiRole = await UserRole.findOne({
+            role_name: { $in: ['LDI', 'ldi_officer'] }
+        });
         const ldiRoleId = ldiRole ? ldiRole._id : null;
 
         let dynamicTotalFarmersCount = 0;
@@ -82,10 +85,17 @@ exports.getDashboardData = async (req, res) => {
                 division_id: { $in: farmerDivisionIds },
                 role_id: farmerRoleId
             }).select('_id').lean();
-            farmerIds = farmers.map(f => f._id);
-            dynamicTotalFarmersCount = farmers.length;
+
+            const farmerUserIds = farmers.map(f => f._id);
+
+            const farmerDocs = await Farmer.find({
+                user_id: { $in: farmerUserIds }
+            }).select('_id user_id').lean();
+
+            farmerIds = farmerDocs.map(f => f._id);
+            dynamicTotalFarmersCount = farmerDocs.length;
         }
-        console.log("Dynamic Total Farmers Count:", farmerIds);
+        console.log("Dynamic Total Farmers Count:", dynamicTotalFarmersCount);
 
         const farmsInFarmerDivisions = await Farm.countDocuments({
             division_id: { $in: farmerDivisionIds }
@@ -99,22 +109,21 @@ exports.getDashboardData = async (req, res) => {
             });
         }
 
-
         const farmsByFarmers = await Farm.find({
-            registered_by: { $in: farmerIds }
-        }).select('_id registered_by').lean();
+            farmer_id: { $in: farmerIds }
+        }).select('_id farmer_id').lean();
+
+
         const totalFarmsByFarmers = farmsByFarmers.length;
-
-        console.log("Total Farms Owned by Farmers:", totalFarmsByFarmers);
-
+        console.log("Total Farms Owned by Farmers (by farmer_id):", totalFarmsByFarmers);
 
         const farmIdsOwnedByFarmers = farmsByFarmers.map(farm => farm._id);
+
         const totalAnimalsByFarmers = await Animal.countDocuments({
             farm_id: { $in: farmIdsOwnedByFarmers },
             current_status: 'Active'
         });
-
-        console.log("Total Animals in Farms Owned by Farmers:", totalAnimalsByFarmers);
+        console.log("Total Animals in Farms Owned by Farmers (by farm_id):", totalAnimalsByFarmers);
 
         const vsSpecificHealthRecords = await AnimalHealthRecord.find({ treated_by: authenticatedUserId })
             .populate({
@@ -127,15 +136,12 @@ exports.getDashboardData = async (req, res) => {
             })
             .lean();
 
-
         const appointmentsRaw = await Appointments.find({
             veterinary_id: authenticatedUserId,
             date: { $gte: today, $lt: tomorrow },
-
         })
             .populate('farm_id', 'farm_name')
             .lean();
-
 
         const todaysAppointments = appointmentsRaw.map(app => {
             const hour = app.hour !== undefined ? app.hour : 0;
@@ -196,18 +202,13 @@ exports.getDashboardData = async (req, res) => {
         const farmIdsManagedByVS = farmsManagedByVS.map(farm => farm._id);
         const activeFarmsCount = farmsManagedByVS.filter(farm => farm.is_active).length;
 
-        const totalAnimalsInVSRelatedFarms = await Animal.countDocuments({
-            farm_id: { $in: farmIdsManagedByVS },
-            current_status: 'Active'
-        });
-
-        const totalCattleInVSRelatedFarms = await Animal.countDocuments({
-            farm_id: { $in: farmIdsManagedByVS },
+        const totalCattleInFarmerFarms = await Animal.countDocuments({
+            farm_id: { $in: farmIdsOwnedByFarmers },
             animal_type: 'Cattle',
             current_status: 'Active'
         });
 
-        console.log("Total Cattle in VS Related Farms:", totalCattleInVSRelatedFarms);
+        console.log("Total Cattle in Farms Owned by Farmers:", totalCattleInFarmerFarms);
 
         const totalBuffaloInVSRelatedFarms = await Animal.countDocuments({
             farm_id: { $in: farmIdsManagedByVS },
@@ -219,7 +220,7 @@ exports.getDashboardData = async (req, res) => {
 
         const areaStats = {
             activeFarms: totalFarmsByFarmers,
-            totalCattle: totalAnimalsByFarmers,
+            totalCattle: totalCattleInFarmerFarms,
             totalBuffalo: totalBuffaloInVSRelatedFarms,
             totalAnimals: totalAnimalsByFarmers,
             avgProduction: avgProduction,
@@ -249,6 +250,7 @@ exports.getDashboardData = async (req, res) => {
         res.status(500).json({ message: "Internal server error occurred while fetching dashboard data.", error: error.message });
     }
 };
+
 
 exports.getUserSettings = async (req, res) => {
     try {
