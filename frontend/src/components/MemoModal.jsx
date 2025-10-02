@@ -35,7 +35,7 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
   const fetchMemos = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/ldi/memos', {
+      const response = await axios.get('/api/ldi/memos', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -55,8 +55,8 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
     e.preventDefault();
     try {
       const url = editingMemo 
-        ? `http://localhost:5000/api/ldi/memos/${editingMemo._id}`
-        : 'http://localhost:5000/api/ldi/memos';
+        ? `/api/ldi/memos/${editingMemo._id}`
+        : '/api/ldi/memos';
       
       const method = editingMemo ? 'put' : 'post';
       
@@ -94,7 +94,7 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
     if (!window.confirm('Are you sure you want to delete this memo?')) return;
     
     try {
-      const response = await axios.delete(`http://localhost:5000/api/ldi/memos/${memoId}`, {
+      const response = await axios.delete(`/api/ldi/memos/${memoId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -113,7 +113,7 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
   const handleStatusToggle = async (memo) => {
     try {
       const newStatus = memo.status === 'pending' ? 'completed' : 'pending';
-      const response = await axios.put(`http://localhost:5000/api/ldi/memos/${memo._id}`, {
+      const response = await axios.put(`/api/ldi/memos/${memo._id}`, {
         ...memo,
         status: newStatus
       }, {
@@ -152,7 +152,7 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 hidden lg:flex backdrop-blur-md">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -167,9 +167,9 @@ export default function MemoModal({ isOpen, onClose, memo = null, onMemoUpdate }
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <XIcon className="w-5 h-5 text-gray-500" />
+            className="relative z-50 p-3 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close modal">
+            <XIcon className="w-6 h-6 text-gray-500" />
           </button>
         </div>
 

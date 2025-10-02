@@ -21,7 +21,7 @@ export default function ProgramAttachmentModal({ isOpen, onClose, program }) {
   const fetchAttachments = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/programs/${program._id}/attachments`, {
+      const response = await axios.get(`/api/programs/${program._id}/attachments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -63,7 +63,7 @@ export default function ProgramAttachmentModal({ isOpen, onClose, program }) {
       formData.append('description', description);
 
       const response = await axios.post(
-        `http://localhost:5000/api/programs/${program._id}/attachments`,
+        `/api/programs/${program._id}/attachments`,
         formData,
         {
           headers: {
@@ -95,7 +95,7 @@ export default function ProgramAttachmentModal({ isOpen, onClose, program }) {
     }
 
     try {
-      await axios.delete(`http://localhost:5000/api/programs/${program._id}/attachments/${attachmentId}`, {
+      await axios.delete(`/api/programs/${program._id}/attachments/${attachmentId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -112,7 +112,7 @@ export default function ProgramAttachmentModal({ isOpen, onClose, program }) {
     try {
       // Use the new download route with authentication
       const response = await axios.get(
-        `http://localhost:5000/api/programs/${program._id}/attachments/${attachment._id}/download`,
+        `/api/programs/${program._id}/attachments/${attachment._id}/download`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -156,9 +156,9 @@ export default function ProgramAttachmentModal({ isOpen, onClose, program }) {
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XIcon className="w-5 h-5" />
+            className="relative z-50 p-3 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close modal">
+            <XIcon className="w-6 h-6 text-gray-500" />
           </button>
         </div>
 

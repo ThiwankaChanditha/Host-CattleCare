@@ -61,10 +61,6 @@ export default function Sidebar() {
     icon: FileTextIcon,
     label: "Reports",
     url: "/ldi/reports"
-  }, {
-    icon: Settings2Icon,
-    label: "Settings",
-    url: "/ldi/settings"
   }];
 
   
@@ -75,7 +71,7 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <>
       <div className="p-4 border-b border-gray-200">
-        <Link to="/dashboard" className="flex items-center space-x-3">
+        <Link to="/ldi/dashboard" className="flex items-center space-x-3">
           <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=48&h=48&q=80" alt="Profile" className="w-10 h-10 rounded-full" />
           <div>
             <h2 className="font-semibold text-gray-800">John Smith</h2>
