@@ -79,8 +79,8 @@ const VSLayout = ({ children }) => {
     <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed }}>
       <div className="flex min-h-screen">
         <VSSidebar />
-        <main
-          className={`flex-1 p-6 bg-gray-50 transition-all duration-300 ease-in-out ${isCollapsed ? 'ml-20' : 'ml-64
+         <main
+          className={`flex-1 p-6 bg-gray-50 transition-all duration-300 ease-in-out ${isCollapsed ? 'ml-20' : 'ml-64'
             }`}
         >
           {children}
