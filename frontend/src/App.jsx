@@ -62,7 +62,7 @@ const Layout = ({ children }) => {
       <div className="flex min-h-screen">
         <Sidebar />
         <main
-          className={`flex-1 p-6 bg-gray-50 transition-all duration-300 ease-in-out ${isCollapsed ? 'ml-20' : 'ml-64'
+          className={`flex-1 px-4 py-6 lg:p-6 bg-gray-50 transition-all duration-300 ease-in-out ${isCollapsed ? 'lg:ml-20' : 'lg:ml-64'
             }`}
         >
           {children}
@@ -80,7 +80,7 @@ const VSLayout = ({ children }) => {
       <div className="flex min-h-screen">
         <VSSidebar />
         <main
-          className={`flex-1 p-6 bg-gray-50 transition-all duration-300 ease-in-out ${isCollapsed ? 'ml-20' : 'ml-64'
+          className={`flex-1 px-4 py-6 lg:p-6 bg-gray-50 transition-all duration-300 ease-in-out ${isCollapsed ? 'lg:ml-20' : 'lg:ml-64'
             }`}
         >
           {children}

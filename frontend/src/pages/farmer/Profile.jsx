@@ -263,7 +263,7 @@ function Profile() {
     return (
         <div className="p-8 bg-gray-50 min-h-screen">
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div className="bg-gradient-to-r from-green-50 to-blue-50 px-6 py-8">
