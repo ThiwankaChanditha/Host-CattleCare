@@ -262,9 +262,14 @@ export default function Sidebar() {
             </div>
 
             {/* Sidebar for desktop and mobile */}
-            <div ref={sidebarRef} className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 shadow-lg z-40 transition-transform duration-300 ease-in-out
-                ${isCollapsed ? 'w-20' : 'w-64'}
-                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:flex lg:flex-col`}>
+            <div
+                ref={sidebarRef}
+                className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 shadow-lg z-40 transition-all duration-300 ease-in-out
+                            ${isCollapsed ? 'w-14' : 'w-44 sm:w-52 md:w-56 lg:w-64'}
+                            ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+                            lg:translate-x-0 lg:static lg:flex lg:flex-col`}
+            >
+
                 <div className={`${isCollapsed ? 'p-2 pt-4' : 'p-4 pt-6'} flex flex-col items-center border-b border-gray-200 transition-all duration-300`}>
                     <Link to={userRolePrefix ? `/${userRolePrefix}/dashboard` : "/"} className="flex flex-col items-center group">
                         <div className="relative">
