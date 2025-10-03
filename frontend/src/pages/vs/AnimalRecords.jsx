@@ -772,7 +772,7 @@ const AnimalRecords = () => {
     }
 
     return (
-        <div className="min-h-screen lg:ml-64 p-4 lg:p-6 bg-white-100">
+        <div className="container mx-auto p-6 bg-white-100 min-h-screen">
             <div className="flex border-b border-gray-200 mb-6">
                 <button
                     className={`py-2 px-4 text-sm font-medium ${activeTab === 'healthRecords'
@@ -795,7 +795,7 @@ const AnimalRecords = () => {
             </div>
 
             {activeTab === 'healthRecords' && (
-                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 space-y-4 lg:space-y-0">
+                <div className="flex justify-between items-center mb-6">
                     <div className="relative w-full max-w-md">
                         <input
                             type="text"
@@ -806,7 +806,7 @@ const AnimalRecords = () => {
                         />
                         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     </div>
-                    <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+                    <div className="flex space-x-4">
                         <div className="relative">
                             <Button
                                 onClick={() => setIsFilterMenuOpen(prev => !prev)}
@@ -817,7 +817,7 @@ const AnimalRecords = () => {
                                 Filters
                             </Button>
                             {isFilterMenuOpen && (
-                                <Card className="absolute left-0 lg:right-0 mt-3 w-full lg:w-72 p-6 bg-white shadow-lg border border-gray-200 rounded-xl z-10 transition-all duration-300 transform scale-100">
+                                <Card className="absolute right-0 mt-3 w-72 p-6 bg-white shadow-lg border border-gray-200 rounded-xl z-10 transition-all duration-300 transform scale-100">
                                     <div className="flex items-center justify-between mb-5">
                                         <h4 className="font-semibold text-gray-800 text-lg">Filter Records</h4>
                                         <div className="w-8 h-1 bg-gradient-to-r from-green-500 to-blue-500 rounded-full"></div>
