@@ -1,12 +1,78 @@
 import DatePicker from "react-datepicker";
-// import "react-datepicker/dist/react-datepicker.css";
 import { Trash2, X, Plus } from 'lucide-react';
+
+const DatePickerStyles = () => (
+    <style>{`
+        .react-datepicker-wrapper {
+            width: 100%;
+        }
+        .react-datepicker__input-container {
+            width: 100%;
+        }
+        .react-datepicker {
+            font-family: inherit;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .react-datepicker__header {
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            border-radius: 0.75rem 0.75rem 0 0;
+            padding-top: 0.5rem;
+        }
+        .react-datepicker__current-month {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        .react-datepicker__day-name {
+            color: #6b7280;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+        .react-datepicker__day {
+            color: #374151;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+        .react-datepicker__day:hover {
+            background-color: #f3f4f6;
+        }
+        .react-datepicker__day--selected,
+        .react-datepicker__day--keyboard-selected {
+            background-color: #10b981;
+            color: white;
+            font-weight: 600;
+        }
+        .react-datepicker__day--selected:hover,
+        .react-datepicker__day--keyboard-selected:hover {
+            background-color: #059669;
+        }
+        .react-datepicker__day--disabled {
+            color: #d1d5db;
+        }
+        .react-datepicker__navigation {
+            top: 0.75rem;
+        }
+        .react-datepicker__navigation-icon::before {
+            border-color: #6b7280;
+        }
+        .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+            border-color: #374151;
+        }
+        .react-datepicker__triangle {
+            display: none;
+        }
+    `}</style>
+);
 
 const Modal = ({ isOpen, onClose, title, footer, children, contentClassName = "" }) => {
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">
+            <DatePickerStyles />
             <div className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" onClick={onClose} />
 
             <div className="flex min-h-screen items-center justify-center p-4">
