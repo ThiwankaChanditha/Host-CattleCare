@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useSidebar } from '../App';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     LayoutDashboardIcon, BellIcon, FileTextIcon, Settings2Icon,
     LogOutIcon, Workflow, BadgeInfo, Upload, X, Trash2, ChevronLeft, ChevronRight, Menu
@@ -97,6 +97,24 @@ export default function Sidebar() {
     const { isCollapsed, setIsCollapsed } = useSidebar();
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const sidebarRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (sidebarRef.current && !sidebarRef.current.contains(event.target) && isMobileMenuOpen) {
+                setIsMobileMenuOpen(false);
+            }
+        };
+
+        if (isMobileMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMobileMenuOpen]);
 
     console.log("Sidebar Render Cycle:");
     console.log("    Current User object in Sidebar:", user);
@@ -244,7 +262,7 @@ export default function Sidebar() {
             </div>
 
             {/* Sidebar for desktop and mobile */}
-            <div className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-lg z-40 transition-transform duration-300 ease-in-out
+            <div ref={sidebarRef} className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 shadow-lg z-40 transition-transform duration-300 ease-in-out
                 ${isCollapsed ? 'w-20' : 'w-64'}
                 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:flex lg:flex-col`}>
                 <div className={`${isCollapsed ? 'p-2 pt-4' : 'p-4 pt-6'} flex flex-col items-center border-b border-gray-200 transition-all duration-300`}>
@@ -289,7 +307,7 @@ export default function Sidebar() {
                     </button>
                 </div>
 
-                <nav className="flex-1 overflow-y-auto py-4 scrollbar-hide">
+                <nav className="flex-1 py-4 scrollbar-hide">
                     <ul className={`space-y-2 ${isCollapsed ? 'px-2' : 'px-4'}`}>
                         {menuItems.map((item) => (
                             <li key={item.labelKey} className="group">
