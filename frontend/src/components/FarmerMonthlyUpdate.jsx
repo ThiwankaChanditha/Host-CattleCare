@@ -390,7 +390,7 @@ const FarmerMonthlyUpdate = () => {
                 </div>
 
                 {/* Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     {/* Milk Production Card */}
                     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 h-40 flex flex-col">
                         <div className="flex items-center gap-3 mb-3">
