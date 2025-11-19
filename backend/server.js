@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 5000;
 
 // ----------------- Models -----------------
 require('./models/users');
+require('./models/password_reset'); 
 require('./models/user_roles');
 require('./models/extension_programs');
 require('./models/extension_participants');
@@ -25,6 +26,7 @@ require('./models/monthly_milk_production');
 require('./models/administrative_divisions');
 
 // ----------------- Routes -----------------
+const passwordResetRoutes = require('./routes/passwordResetRoutes');
 const authRoutes = require('./routes/auth');
 const forumRoutes = require('./controllers/forum');
 const programRoutes = require('./routes/programRoutes');
@@ -72,6 +74,7 @@ fs.mkdirSync(profileUploadsDir, { recursive: true });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ----------------- API Routes -----------------
+app.use('/api/password-reset', passwordResetRoutes);
 app.use('/api', authRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/notifications', notificationRoutes);

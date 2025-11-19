@@ -59,6 +59,68 @@ const translations = {
             failedToEditPost: "பதிவை திருத்த முடியவில்லை"
         }
     },
+    forgotPassword: {
+        en: {
+            title: 'Reset Password',
+            emailPlaceholder: 'Enter your email',
+            sendOTP: 'Send OTP',
+            otpPlaceholder: 'Enter 6-digit OTP',
+            verifyOTP: 'Verify OTP',
+            newPasswordPlaceholder: 'Enter new password',
+            confirmPasswordPlaceholder: 'Confirm new password',
+            resetPassword: 'Reset Password',
+            backToLogin: 'Back to Login',
+            resendOTP: 'Resend OTP',
+            otpExpiresIn: 'OTP expires in',
+            passwordMismatch: 'Passwords do not match',
+            passwordTooShort: 'Password must be at least 6 characters',
+            successMessage: 'Password reset successful! You can now login.',
+            close: 'Close',
+            sending: 'Sending...',
+            verifying: 'Verifying...',
+            resetting: 'Resetting...'
+        },
+        si: {
+            title: 'මුරපදය යළි පිහිටුවන්න',
+            emailPlaceholder: 'ඔබගේ විද්‍යුත් තැපෑල ඇතුළත් කරන්න',
+            sendOTP: 'OTP එවන්න',
+            otpPlaceholder: 'ඉලක්කම් 6ක OTP ඇතුළත් කරන්න',
+            verifyOTP: 'OTP සත්‍යාපනය කරන්න',
+            newPasswordPlaceholder: 'නව මුරපදය ඇතුළත් කරන්න',
+            confirmPasswordPlaceholder: 'මුරපදය තහවුරු කරන්න',
+            resetPassword: 'මුරපදය යළි පිහිටුවන්න',
+            backToLogin: 'පිවිසුමට ආපසු',
+            resendOTP: 'OTP නැවත එවන්න',
+            otpExpiresIn: 'OTP කල් ඉකුත් වන්නේ',
+            passwordMismatch: 'මුරපද ගැලපෙන්නේ නැත',
+            passwordTooShort: 'මුරපදය අවම වශයෙන් අක්ෂර 6ක් විය යුතුය',
+            successMessage: 'මුරපදය සාර්ථකව යළි පිහිටුවන ලදී! දැන් ඔබට පිවිසිය හැක.',
+            close: 'වසන්න',
+            sending: 'එවමින්...',
+            verifying: 'සත්‍යාපනය කරමින්...',
+            resetting: 'යළි පිහිටුවමින්...'
+        },
+        ta: {
+            title: 'கடவுச்சொல்லை மீட்டமைக்கவும்',
+            emailPlaceholder: 'உங்கள் மின்னஞ்சலை உள்ளிடவும்',
+            sendOTP: 'OTP அனுப்பவும்',
+            otpPlaceholder: '6 இலக்க OTP உள்ளிடவும்',
+            verifyOTP: 'OTP சரிபார்க்கவும்',
+            newPasswordPlaceholder: 'புதிய கடவுச்சொல்லை உள்ளிடவும்',
+            confirmPasswordPlaceholder: 'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
+            resetPassword: 'கடவுச்சொல்லை மீட்டமைக்கவும்',
+            backToLogin: 'உள்நுழைவுக்கு திரும்பு',
+            resendOTP: 'OTP மீண்டும் அனுப்பவும்',
+            otpExpiresIn: 'OTP காலாவதியாகிறது',
+            passwordMismatch: 'கடவுச்சொற்கள் பொருந்தவில்லை',
+            passwordTooShort: 'கடவுச்சொல் குறைந்தது 6 எழுத்துக்கள் இருக்க வேண்டும்',
+            successMessage: 'கடவுச்சொல் வெற்றிகரமாக மீட்டமைக்கப்பட்டது! இப்போது நீங்கள் உள்நுழையலாம்.',
+            close: 'மூடு',
+            sending: 'அனுப்புகிறது...',
+            verifying: 'சரிபார்க்கிறது...',
+            resetting: 'மீட்டமைக்கிறது...'
+        }
+    },
     addQuestionModal: {
         en: {
             addNewQuestion: "Add New Question",

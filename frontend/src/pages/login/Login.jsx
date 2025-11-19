@@ -1,3 +1,4 @@
+// frontend/src/pages/login/Login.jsx
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -5,6 +6,7 @@ import illustration from "./illustration.png";
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import translations from '../../utility/translations';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -12,6 +14,7 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
     const { language, changeLanguage } = useLanguage();
@@ -46,7 +49,6 @@ export default function Login() {
                 const loginSuccessfulInContext = login(userWithToken);
 
                 console.log("Login.jsx: Result of AuthContext login function:", loginSuccessfulInContext);
-
 
                 if (loginSuccessfulInContext) {
                     navigate(`/${userDetails.dashboard.replace("_dashboard", "")}/dashboard`);
@@ -128,9 +130,12 @@ export default function Login() {
 
                     <div className="text-sm text-center mt-6 text-gray-500">
                         <p>
-                            <a href="#" className="text-green-600 hover:underline" onClick={(e) => e.preventDefault()}>
+                            <button
+                                onClick={() => setShowForgotPassword(true)}
+                                className="text-green-600 hover:underline focus:outline-none"
+                            >
                                 {t.forgotPassword}
-                            </a>
+                            </button>
                         </p>
                     </div>
                 </div>
@@ -147,6 +152,13 @@ export default function Login() {
                     <option value="ta">தமிழ்</option>
                 </select>
             </div>
+
+            {/* Forgot Password Modal */}
+            {showForgotPassword && (
+                <ForgotPasswordModal
+                    onClose={() => setShowForgotPassword(false)}
+                />
+            )}
 
             {/* Footer */}
             <footer className="absolute bottom-4 text-gray-400 text-sm text-center w-full">
