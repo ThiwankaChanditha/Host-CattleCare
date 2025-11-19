@@ -9,7 +9,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
 const Dashboard = () => {
-  const [selectedRegion, setSelectedRegion] = useState('All Regions');
   const [chartData, setChartData] = useState([]);
   const [totalFarms, setTotalFarms] = useState(0);
   const [totalMilk, setTotalMilk] = useState(0);
@@ -64,13 +63,13 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-800">System Dashboard</h1>
-        <RegionSelector selectedRegion={selectedRegion} setSelectedRegion={setSelectedRegion} />
+        {/* <RegionSelector selectedRegion={selectedRegion} setSelectedRegion={setSelectedRegion} /> */}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Farms" value={totalFarms.toLocaleString()} change="+11%" isPositive={true} icon={<Users className="text-blue-500" />} />
-        <StatCard title="Milk Production" value={`${totalMilk.toLocaleString()} L`} change="+5.2%" isPositive={true} icon={<Milk className="text-green-500" />} />
-        <StatCard title="Cattle Population" value={totalCattle.toLocaleString()} change="+3.7%" isPositive={true} icon={<Shell className="text-amber-700" />} />
-        <StatCard title="Pending Validations" value="38" change="-8%" isPositive={false} icon={<CalendarClock className="text-red-500" />} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatCard title="Total Farms" value={totalFarms.toLocaleString()} isPositive={true} icon={<Users className="text-blue-500" />} />
+        <StatCard title="Milk Production" value={`${totalMilk.toLocaleString()} L`} isPositive={true} icon={<Milk className="text-green-500" />} />
+        <StatCard title="Cattle Population" value={totalCattle.toLocaleString()} isPositive={true} icon={<Shell className="text-amber-700" />} />
+        {/* <StatCard title="Pending Validations" value="38" change="-8%" isPositive={false} icon={<CalendarClock className="text-red-500" />} /> */}
       </div>
 
       {/* Farm Distribution & Production - Full Width */}
@@ -95,7 +94,7 @@ const Dashboard = () => {
       </div>
 
       {/* Farm Type Distribution and Recent Notifications - Same Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-4">
           <h2 className="text-lg font-medium text-gray-800 mb-4">Farm Type Distribution</h2>
           <div className="h-80">
@@ -111,13 +110,13 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-4">
+        {/* <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-medium text-gray-800">Recent Notifications</h2>
             <Bell size={18} />
           </div>
           <NotificationPanel />
-        </div>
+        </div> */}
       </div>
     </div>
   );
